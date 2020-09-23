@@ -13,8 +13,8 @@ source("/Users/James/James/Reproducibility-in-Cricket/code/scraping_functions.R"
 system('docker kill $(docker ps -q)')
 system('docker run -d -p 4445:4444 --shm-size 2g selenium/standalone-chrome')
 # Run this loop, it catches a few errors that are common and can be ignored. If the tournament has
-# a broken link, remove_master underneth willt take the year and row number as an argument and 
-# remove it for you
+# a broken link, remove_master underneth will take the year and row number as an argument and 
+# remove it for you. The links are printed for each 
 complete = 0
 while(complete!=1){
 	commentary <- try(grab_tournament_links(2018, "/Users/James/James/Reproducibility-in-Cricket"))
@@ -59,7 +59,7 @@ while(complete!=1){
 }
 
 # We leave this commented out when not in use to avoid accidentally removing a good row
-# remove_master_row(20202021, "/Users/James/James/Reproducibility-in-Cricket", 10)
+# remove_master_row(2018, "/Users/James/James/Reproducibility-in-Cricket", 98)
 
 # Now we scrape the season for the new data
 complete = 0

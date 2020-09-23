@@ -64,7 +64,7 @@ get_season <- function(input_year, input_link){
 # folders, beginning with a Data folder to hold each season
 
 grab_tournament_links <- function(year_input, root_path){
-	system('docker kill $(docker ps -q)')
+	# system('docker kill $(docker ps -q)')
 	# tourney_list_site is the season archive page for cricinfo
 	tourney_list_site <- "http://www.espncricinfo.com/ci/engine/series/index.html"
 	# basic prefix
@@ -1089,7 +1089,7 @@ remove_master_row <- function(year_input, root_path, row_to_drop){
 # So just use the same root as before, to the folder that will contain all the code, and data, and
 # whatever else you may eventially put in here in your cricket analysis
 collect_commentary_html_new_new_format <- function(year_input, root_path){
-	system('docker kill $(docker ps -q)')
+	# system('docker kill $(docker ps -q)')
 	# Set up the appropriate paths first
 	
 	data_path <- paste(root_path, "/", "Data", sep = "")
@@ -1232,7 +1232,7 @@ collect_commentary_html_new_new_format <- function(year_input, root_path){
 					# Read in commentary page
 					remDr <- RSelenium::remoteDriver(remoteServerAddr = "localhost",
 																					 port = 4444L,
-																					 browserName = "firefox")
+																					 browserName = "chrome")
 					Sys.sleep(5)
 					remDr$open(silent = TRUE)
 					Sys.sleep(5)
@@ -1381,7 +1381,7 @@ collect_commentary_html_new_new_format <- function(year_input, root_path){
 					
 					remDr <- RSelenium::remoteDriver(remoteServerAddr = "localhost",
 																					 port = 4444L,
-																					 browserName = "firefox")
+																					 browserName = "chrome")
 					Sys.sleep(5)
 					remDr$open(silent = TRUE)
 					Sys.sleep(5)
