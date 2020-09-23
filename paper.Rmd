@@ -60,3 +60,7 @@ maybe include stuff around cricviz interesting tweets but fans can recreate or i
 | examples                     | Robert - start (assume same csv being used) - cool cricket example stuff |
 
 : things to do
+
+## How would you recommend evaluating the selection of players to reduce the required run rate? Is there a tool that would could be used to let coaches or selectors do this themselves or is it would it be more appropriate to have an analyst do this prior?
+
+##  
