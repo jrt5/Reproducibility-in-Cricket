@@ -1,5 +1,5 @@
 # This function will alter the input year to the correct format for the url in ESPNcricinfo
-get_season <- function(input_year){
+get_season <- function(input_year, input_link){
 	
 	print(paste("Scraping the", input_year, "data"))
 	
@@ -19,7 +19,7 @@ get_season <- function(input_year){
 		not_year <- paste(year, "%", half_season, sep = "")
 		
 		links <- 
-			tourney_list_site_data %>%
+			input_link %>%
 			html_nodes(".season-links") %>%
 			html_nodes("a") %>%
 			html_attr(name = "href") %>% 
@@ -36,7 +36,7 @@ get_season <- function(input_year){
 		year <- paste(first_year, "%", second_year, sep= "")
 		
 		links <- 
-			tourney_list_site_data %>%
+			input_link %>%
 			html_nodes(".season-links") %>%
 			html_nodes("a") %>%
 			html_attr(name = "href") %>% 
@@ -88,7 +88,8 @@ grab_tournament_links <- function(year_input, root_path){
 	}
 	# Create the master spreadsheet for the year if it doesn't exist. If it does just read it in
 	if(!file.exists(master_path)){
-		year_link<- get_season(year_input)
+		year_link<- get_season(year_input, 
+													 tourney_list_site_data)
 		full_link <- paste(web_prefix, year_link, sep = "")
 		# The get season function just changes the input year from a numeric to the strange format they
 		# use on cric info. It then reads the season archive page, finds the correct link, and outputs
@@ -1049,4 +1050,47 @@ extract_year <- function(this_date){
 	out <- list(year = year, 
 							date_minus_year = this_date)
 	return(year)
+}
+
+# Webscraping is a bit messy, so occasionally it's easier to just drop a bad link from the scraping
+# process altogether. These functions will drop them for you
+remove_commentary_row <- function(year_input, comp_type, row_to_drop){
+	if(comp_type == "pc"){
+		data_path <- "D:\\Cricket_Thesis\\Data"
+		year_path <- paste(data_path, "\\", year_input, sep = "")
+		year_master_spreadsheet_path <- paste(year_path, "\\master.csv", sep = "")
+		year_master_scorecard_spreadsheet_path <- paste(year_path, "\\master_scorecard.csv", sep = "")
+		year_master_commentary_spreadsheet_path <- paste(year_path, "\\master_commentary.csv", sep = "")
+	}else{
+		data_path <- "/Users/James/James/Cricket_Thesis/Data"
+		year_path <- paste(data_path, "/", year_input, sep = "")
+		year_master_spreadsheet_path <- paste(year_path, "/master.csv", sep = "")
+		year_master_scorecard_spreadsheet_path <- paste(year_path, "/master_scorecard.csv", sep = "")
+		year_master_commentary_spreadsheet_path <- paste(year_path, "/master_commentary.csv", sep = "")
+	}
+	
+	master <- read_csv(year_master_commentary_spreadsheet_path) %>% 
+		slice(-row_to_drop)
+	
+	write_csv(master, year_master_commentary_spreadsheet_path)
+}
+remove_master_row <- function(year_input, comp_type, row_to_drop){
+	if(comp_type == "pc"){
+		data_path <- "D:\\Cricket_Thesis\\Data"
+		year_path <- paste(data_path, "\\", year_input, sep = "")
+		year_master_spreadsheet_path <- paste(year_path, "\\master.csv", sep = "")
+		year_master_scorecard_spreadsheet_path <- paste(year_path, "\\master_scorecard.csv", sep = "")
+		year_master_commentary_spreadsheet_path <- paste(year_path, "\\master_commentary.csv", sep = "")
+	}else{
+		data_path <- "/Users/James/James/Cricket_Thesis/Data"
+		year_path <- paste(data_path, "/", year_input, sep = "")
+		year_master_spreadsheet_path <- paste(year_path, "/master.csv", sep = "")
+		year_master_scorecard_spreadsheet_path <- paste(year_path, "/master_scorecard.csv", sep = "")
+		year_master_commentary_spreadsheet_path <- paste(year_path, "/master_commentary.csv", sep = "")
+	}
+	
+	master <- read_csv(year_master_spreadsheet_path) %>% 
+		slice(-row_to_drop)
+	
+	write_csv(master, year_master_spreadsheet_path)
 }
