@@ -64,6 +64,7 @@ get_season <- function(input_year, input_link){
 # folders, beginning with a Data folder to hold each season
 
 grab_tournament_links <- function(year_input, root_path){
+	system('docker kill $(docker ps -q)')
 	# tourney_list_site is the season archive page for cricinfo
 	tourney_list_site <- "http://www.espncricinfo.com/ci/engine/series/index.html"
 	# basic prefix
@@ -144,6 +145,10 @@ grab_tournament_links <- function(year_input, root_path){
 	# a webpage that changes based on some buttons without altering the url. Docker is a free program
 	# that you will need to install to scrape this website
 	
+	total_tournaments <- 
+		master_spreadsheet %>% 
+		distinct(tournament_name, tournament_type) %>% 
+		nrow()
 	# We'll scrape from the bottom up to the top of the spreadsheet
 	for(i in nrow(master_spreadsheet):1){
 		this_row <- 
@@ -157,9 +162,10 @@ grab_tournament_links <- function(year_input, root_path){
 			 !"commentary_link" %in% colnames(master_spreadsheet) & 
 			 !"status" %in% colnames(master_spreadsheet) & 
 			 !"date" %in% colnames(master_spreadsheet)){
-			print(paste(i, "/", nrow(master_spreadsheet), " remaining: ",
+			print(paste(i, "/", total_tournaments, " remaining: ",
 									this_row$tournament_name, ", a ", this_row$tournament_type, 
 									" tournament in ", year_input, " is being scraped", sep = ""))
+			print(this_row$tournament_link)
 			
 			# The default is to load the "fixtures" page, which has upcoming tournaments. Results has to be
 			# loaded separately
@@ -334,9 +340,10 @@ grab_tournament_links <- function(year_input, root_path){
 			# column.y, which we will coalesce into a single column. Otherwie nothing changes from above
 			if(is.na(this_row$scorecard_link)){
 				# If somehting broke the loop, it will continue from where it left off
-				print(paste(i, "/", nrow(master_spreadsheet), " remaining: ",
+				print(paste(i, "/", total_tournaments, " remaining: ",
 										this_row$tournament_name, ", a ", this_row$tournament_type, 
 										" tournament in ", year_input, " is being scraped", sep = ""))
+				print(this_row$tournament_link)
 				
 				this_tournament_upcoming <- 
 					read_html(paste(this_row$tournament_link, fixtures_suffix, sep = ""))
@@ -498,11 +505,9 @@ grab_tournament_links <- function(year_input, root_path){
 				
 				write_csv(master_spreadsheet, master_path)
 			}else{
-				# print(paste(i, "/", nrow(master_spreadsheet), " remaining: ",
-				#             this_row$tournament_name, ", a ", this_row$tournament_type, 
-				#             " tournament in ", year_input, " has already been scraped", sep = ""))
-				print(paste(i, "/", nrow(master_spreadsheet), sep = ""))
-				write_csv(master_spreadsheet, master_path)
+				
+				# print(paste(i, "/", total_tournaments, sep = ""))
+				# write_csv(master_spreadsheet, master_path)
 			}
 		}
 	}
@@ -1054,43 +1059,483 @@ extract_year <- function(this_date){
 
 # Webscraping is a bit messy, so occasionally it's easier to just drop a bad link from the scraping
 # process altogether. These functions will drop them for you
-remove_commentary_row <- function(year_input, comp_type, row_to_drop){
-	if(comp_type == "pc"){
-		data_path <- "D:\\Cricket_Thesis\\Data"
-		year_path <- paste(data_path, "\\", year_input, sep = "")
-		year_master_spreadsheet_path <- paste(year_path, "\\master.csv", sep = "")
-		year_master_scorecard_spreadsheet_path <- paste(year_path, "\\master_scorecard.csv", sep = "")
-		year_master_commentary_spreadsheet_path <- paste(year_path, "\\master_commentary.csv", sep = "")
-	}else{
-		data_path <- "/Users/James/James/Cricket_Thesis/Data"
-		year_path <- paste(data_path, "/", year_input, sep = "")
-		year_master_spreadsheet_path <- paste(year_path, "/master.csv", sep = "")
-		year_master_scorecard_spreadsheet_path <- paste(year_path, "/master_scorecard.csv", sep = "")
-		year_master_commentary_spreadsheet_path <- paste(year_path, "/master_commentary.csv", sep = "")
-	}
+remove_commentary_row <- function(year_input, root_path, row_to_drop){
 	
-	master <- read_csv(year_master_commentary_spreadsheet_path) %>% 
+	data_path <- paste(root_path, "/Data", sep = "")
+	year_path <- paste(data_path, "/", year_input, sep = "")
+	year_master_spreadsheet_path <- paste(year_path, "/master.csv", sep = "")
+	year_master_commentary_spreadsheet_path <- paste(year_path, "/master_commentary.csv", sep = "")
+	
+	master <- 
+		read_csv(year_master_commentary_spreadsheet_path) %>% 
 		slice(-row_to_drop)
-	
 	write_csv(master, year_master_commentary_spreadsheet_path)
+	
 }
-remove_master_row <- function(year_input, comp_type, row_to_drop){
-	if(comp_type == "pc"){
-		data_path <- "D:\\Cricket_Thesis\\Data"
-		year_path <- paste(data_path, "\\", year_input, sep = "")
-		year_master_spreadsheet_path <- paste(year_path, "\\master.csv", sep = "")
-		year_master_scorecard_spreadsheet_path <- paste(year_path, "\\master_scorecard.csv", sep = "")
-		year_master_commentary_spreadsheet_path <- paste(year_path, "\\master_commentary.csv", sep = "")
+remove_master_row <- function(year_input, root_path, row_to_drop){
+	
+	data_path <- paste(root_path, "/Data", sep = "")
+	year_path <- paste(data_path, "/", year_input, sep = "")
+	year_master_spreadsheet_path <- paste(year_path, "/master.csv", sep = "")
+
+	master <- 
+		read_csv(year_master_spreadsheet_path) %>% 
+		slice(-row_to_drop)
+	write_csv(master, year_master_spreadsheet_path)
+	
+}
+
+
+# So just use the same root as before, to the folder that will contain all the code, and data, and
+# whatever else you may eventially put in here in your cricket analysis
+collect_commentary_html_new_new_format <- function(year_input, root_path){
+	system('docker kill $(docker ps -q)')
+	# Set up the appropriate paths first
+	
+	data_path <- paste(root_path, "/", "Data", sep = "")
+	year_path <- paste(data_path, "/", "year_input", sep = "")
+	year_master_spreadsheet_path <- paste(year_path, "/master.csv", sep = "")
+	year_master_commentary_spreadsheet_path <- paste(year_path, "/master_commentary.csv", sep = "")
+	
+	# Firstly, if there is no commentary spreadsheet I need to create it and save it with
+	# appropriate columns (tests would need 4 innings, I don't think I'll ever use them but they're there)
+	
+	if(!file.exists(year_master_commentary_spreadsheet_path)){
+		master_commentary_spreadsheet <- read_csv(year_master_spreadsheet_path)
+		
+		master_commentary_spreadsheet$inning_1_commentary <- NA
+		master_commentary_spreadsheet$inning_2_commentary <- NA
+		master_commentary_spreadsheet$inning_3_commentary <- NA
+		master_commentary_spreadsheet$inning_4_commentary <- NA
+		master_commentary_spreadsheet$commentary_scraped <- NA
+		master_commentary_spreadsheet$scorecard_scraped <- NA
+		master_commentary_spreadsheet$scorecard_path <- NA
+		
+		# I also organize these by the order I am interested, and I stop the function when I reach 
+		# the last tournaent type. Since I didn't both putting in a Test scraping ability to this funtion, 
+		# all tests formats are listed last, followed by Youth  and minor tours since those tournaments have 
+		# frequently missing or poor quality commentary. Reorganize by interest as needed
+		master_commentary_spreadsheet <- 
+			master_commentary_spreadsheet %>%
+			arrange(factor(tournament_type, c("Twenty20 Internationals",
+																				"Twenty20",
+																				"One-Day Internationals",
+																				"Women's Twenty20 Internationals",
+																				"Woman's One-Day Internationals",
+																				"Other Twenty20 matches",
+																				"Other one-day_limited-overs matches",
+																				"Tests",
+																				"First-class",
+																				"List A",
+																				"Woman's Tests",
+																				"Other matches",
+																				"tour",
+																				"minor tour",
+																				"Youth One-Day Internationals",
+																				"Youth Tests",
+																				"Youth Twenty20 Internationals"
+			))) %>% 
+			distinct()
+		
+		write_csv(master_commentary_spreadsheet, year_master_commentary_spreadsheet_path)
 	}else{
-		data_path <- "/Users/James/James/Cricket_Thesis/Data"
-		year_path <- paste(data_path, "/", year_input, sep = "")
-		year_master_spreadsheet_path <- paste(year_path, "/master.csv", sep = "")
-		year_master_scorecard_spreadsheet_path <- paste(year_path, "/master_scorecard.csv", sep = "")
-		year_master_commentary_spreadsheet_path <- paste(year_path, "/master_commentary.csv", sep = "")
+		master_commentary_spreadsheet <- read_csv(year_master_commentary_spreadsheet_path)
 	}
 	
-	master <- read_csv(year_master_spreadsheet_path) %>% 
-		slice(-row_to_drop)
+	where_we_left_off <- 
+		master_commentary_spreadsheet %>% 
+		mutate(row_n = row_number()) %>% 
+		dplyr::filter(is.na(commentary_scraped)) %>% 
+		slice(1) %>% 
+		pull(row_n)
 	
-	write_csv(master, year_master_spreadsheet_path)
+	# After a game is scraped the NA becomes a "yes", so you can pick up where you left off
+	
+	for(i in where_we_left_off:nrow(master_commentary_spreadsheet)){
+		print(paste(i, "/", nrow(master_commentary_spreadsheet)))
+
+		this_row <- 
+			master_commentary_spreadsheet %>% 
+			slice(i)
+		
+		# So to be safe you only want to grab matches that have been played. 
+		# A game than was played at an earlier date is guaranteed to be over. 
+		if(this_row$ending_date<Sys.Date()){
+			
+			# How many times do I need to scroll down the page depends on the tournament type. This is overkill, 
+			# you don't need to scroll this many times, but this function was not built to be fast, but to
+			# crawl through the links and grab the full commentary
+			if(this_row$tournament_type %in% c("Twenty20", "Twenty20 Internationals", 
+																				 "Women's Twenty20 Internationals", 
+																				 "Other Twenty20 matches", "Youth Twenty20 Internationals")){
+				scroll_number <-  20*1.5
+			}else if(this_row$tournament_type %in% c("One-Day Internationals", "Youth One-Day Internationals", 
+																							 "Other one-day_limited-overs matches", "List A", 
+																							 "Women's One-Day Internationals")){
+				scroll_number <- 50*1.5
+			}else{
+				scroll_number <- 100*1.5
+			} 
+			# SOme weird problems with scraped links is there is repeat of the base url, get rid of it and
+			# replace with the correct version
+			if(str_detect(master_commentary_spreadsheet$commentary_link[i], "http://www.espncricinfo.comhttps://www.espncricinfo.com")){
+				master_commentary_spreadsheet$commentary_link[i] <- str_replace(master_commentary_spreadsheet$commentary_link[i], 
+																																				"http://www.espncricinfo.comhttps://www.espncricinfo.com", "http://www.espncricinfo.com")
+				master_commentary_spreadsheet$commentary_link[i] <- str_sub(master_commentary_spreadsheet$commentary_link[i],
+																																		1, str_length(master_commentary_spreadsheet$commentary_link[i])-1)
+				write_csv(master_commentary_spreadsheet, year_master_commentary_spreadsheet_path)
+			}
+			# Setting up paths for commentary html to be saved to
+			type_path <- paste(year_path, "/", master_commentary_spreadsheet$tournament_type[i], 
+												 sep = "")
+			name_path <- paste(type_path, "/", master_commentary_spreadsheet$tournament_name[i], 
+												 sep = "")
+			if(!dir.exists(type_path)){
+				dir.create(type_path, showWarnings = FALSE)
+			}
+			if(!dir.exists(name_path)){
+				dir.create(name_path, showWarnings = FALSE)
+			}
+			# Just letting you know what game we're scraping, and some more paths. 
+			game_name <- 
+				master_commentary_spreadsheet %>%
+				slice(i) %>%
+				dplyr::select(scorecard_link) %>%
+				pull() 
+			game_name <- word(word(game_name, 2, sep = "scorecard/"), 2, sep = "\\/")
+			commentary_path_1 <- paste(name_path, "/", game_name, 
+																 "_inning_", 1, "_commentary.html", sep = "")
+			commentary_path_2 <- paste(name_path, "/", game_name, 
+																 "_inning_", 2, "_commentary.html", sep = "")
+			scorecard_path <- paste(name_path, "/", game_name, 
+															"_scorecard.html", sep = "")
+			print(paste("Grabbing the commentary and scorecard html for ",
+									master_commentary_spreadsheet$tournament_name[i], 
+									", ", game_name, ", 2 innings", sep = ""))
+			print(master_commentary_spreadsheet$commentary_link[i])
+			
+			# If we haven't gotten the scorecard yet, grab it. No need for docker
+			if(!file.exists(scorecard_path)){
+				this_scorecard <- 
+					read_html(this_row$scorecard_link)
+				write_xml(this_scorecard, scorecard_path)
+				Sys.sleep(sample(5:15, 1))
+			}
+			master_commentary_spreadsheet$scorecard_path[i] <- scorecard_path
+			master_commentary_spreadsheet$scorecard_scraped[i] <- "yes"
+			write_csv(master_commentary_spreadsheet, year_master_commentary_spreadsheet_path)
+			# Check if the first commentary file already exists
+			if(is.na(this_row$commentary_scraped)){
+				if(!file.exists(commentary_path_1)){
+					print("Scraping inning 1")
+					# Open docker
+					# Read in commentary page
+					remDr <- RSelenium::remoteDriver(remoteServerAddr = "localhost",
+																					 port = 4444L,
+																					 browserName = "firefox")
+					Sys.sleep(5)
+					remDr$open(silent = TRUE)
+					Sys.sleep(5)
+					remDr$navigate(this_row$commentary_link) 
+					remDr$setWindowSize(width = 1260, height = 600)
+					webElem <- remDr$findElement("css", "body")
+					Sys.sleep(1)
+					webElem$sendKeysToElement(list(key = "end"))
+					# remDr$screenshot(display = TRUE)
+					pre_scroll <- 
+						read_html(remDr$getPageSource()[[1]])
+					
+					# So there are a few different formats we have found on the website telling the reader the
+					# game was abandoned, no result, or simply missing comentary. We check for these, and if not
+					# then we proceed with the scraping. We've added to this over time as new formts appear, and 
+					# will continue to do so
+					pre_scroll_empty <- 
+						pre_scroll %>% 
+						html_nodes(".box-shadow-none") %>% 
+						html_text() %>%
+						as_tibble() %>% 
+						dplyr::filter(value == "No content available") %>% 
+						nrow() > 0
+					
+					pre_scroll_abandoned <- 
+						pre_scroll %>% 
+						html_nodes(".event-full-width") %>% 
+						html_text() %>% 
+						as_tibble() %>% 
+						mutate(value = tolower(value)) %>% 
+						dplyr::filter(grepl("abandon", value)) %>% 
+						nrow()>0
+					
+					pre_scroll_abandoned2 <- 
+						pre_scroll %>% 
+						html_nodes(".event") %>% 
+						html_text() %>% 
+						as_tibble() %>% 
+						mutate(value = tolower(value)) %>% 
+						dplyr::filter(grepl("abandon", value)) %>% 
+						nrow()>0
+					
+					pre_scroll_no_result <- 
+						pre_scroll %>% 
+						html_nodes(".event-full-width") %>% 
+						html_text() %>% 
+						as_tibble() %>% 
+						mutate(value = tolower(value)) %>% 
+						dplyr::filter(grepl("no result", value)) %>% 
+						nrow()>0
+					
+					if(pre_scroll_empty == TRUE){
+						print("This commentary doesn't exist")
+					}else if(pre_scroll_abandoned==TRUE){
+						print("This match was abandoned")
+					}else if(pre_scroll_abandoned2==TRUE){
+						print("This match was abandoned")
+					}else if(pre_scroll_no_result==TRUE){
+						print("This match has no result")
+					}else{
+						# The buttons are named by the team abbreviation + "Innings". This is to 
+						# help locate the button at the top for each innings
+						inning_buttons_names <- 
+							pre_scroll %>% 
+							html_nodes(".team-name") %>% 
+							html_text() %>% 
+							as_tibble()
+						
+						# This is the button path, its specific to this game. This part would need to be altered to
+						# scrape test format cricket commentary
+						inning1_button_name <- 
+							paste("//div/div/div[contains(text(),", 
+										"'", 
+										inning_buttons_names %>% 
+											slice(1) %>% 
+											pull(),
+										" Innings'", 
+										")]", 
+										sep = "")
+						
+						inning2_button_name <- 
+							paste("//div/div/div[contains(text(),", 
+										"'", 
+										inning_buttons_names %>% 
+											slice(2) %>% 
+											pull(),
+										" Innings'", 
+										")]", 
+										sep = "")
+						
+						# This is the general path to the dropdown menu, which is general to all commentary
+						inning_button_name <- 
+							paste("//div/div/div/div[contains(text(),", 
+										"'", 
+										"Innings",
+										"'", 
+										")]", 
+										sep = "")
+						# I will need to click outside of the dropdown menu to scroll, all games seem 
+						# to end with this phrase. I may add more possible phrases if this doesn't work, 
+						# but that hasn't been a problem yet
+						webpage_body <- 
+							"//span[contains(text(),  'end of over')]"
+						# Click dropdown
+						element <- remDr$findElement(using = "xpath", inning_button_name)
+						element$clickElement()
+						Sys.sleep(5)
+						# Then, select the first inning from the dropdown
+						element <- remDr$findElement(using = "xpath", inning1_button_name)
+						element$clickElement()
+						Sys.sleep(5)
+						# remDr$screenshot(display = TRUE)
+						# Click body of webpage outside dropdown menu
+						element <- remDr$findElement(using = "xpath", webpage_body)
+						element$clickElement()
+						Sys.sleep(5)
+						# remDr$screenshot(display = TRUE)
+						webElem <- remDr$findElement("css", "body")
+						# Scroll to bottom, this is more page downs than necessary, probably by a lot
+						print("Scrolling down")
+						for(k in 1:scroll_number){
+							webElem$sendKeysToElement(list(key = "end"))
+							Sys.sleep(2)
+							print(k)
+						}
+						# remDr$screenshot(display = TRUE)
+						# Save the html to the path specified earlier. 
+						page_source<-remDr$getPageSource()
+						inning1_html <- read_html(page_source[[1]])
+						write_xml(inning1_html, commentary_path_1)
+						master_commentary_spreadsheet$inning_1_commentary[i] <- commentary_path_1
+						write_csv(master_commentary_spreadsheet, year_master_commentary_spreadsheet_path)
+						
+					}
+					# close the window
+					remDr$close()
+				}else{
+					# It's possible it has been scraped already, so we skip if that's the case to save time
+					print("Inning 1 has already been scraped")
+					master_commentary_spreadsheet$inning_1_commentary[i] <- commentary_path_1
+					write_csv(master_commentary_spreadsheet, year_master_commentary_spreadsheet_path)
+				}
+				# Do it all over again for the second inning. 
+				if(!file.exists(commentary_path_2)){
+					print("Scraping inning 2")
+					
+					remDr <- RSelenium::remoteDriver(remoteServerAddr = "localhost",
+																					 port = 4444L,
+																					 browserName = "firefox")
+					Sys.sleep(5)
+					remDr$open(silent = TRUE)
+					Sys.sleep(5)
+					remDr$navigate(this_row$commentary_link) 
+					remDr$setWindowSize(width = 1260, height = 600)
+					webElem <- remDr$findElement("css", "body")
+					Sys.sleep(1)
+					webElem$sendKeysToElement(list(key = "end"))
+					remDr$screenshot(display = TRUE)
+					pre_scroll <- 
+						read_html(remDr$getPageSource()[[1]])
+					
+					pre_scroll_empty <- 
+						pre_scroll %>% 
+						html_nodes(".box-shadow-none") %>% 
+						html_text() %>%
+						as_tibble() %>% 
+						dplyr::filter(value == "No content available") %>% 
+						nrow() > 0
+					
+					pre_scroll_abandoned <- 
+						pre_scroll %>% 
+						html_nodes(".event-full-width") %>% 
+						html_text() %>% 
+						as_tibble() %>% 
+						mutate(value = tolower(value)) %>% 
+						dplyr::filter(grepl("abandon", value)) %>% 
+						nrow()>0
+					
+					pre_scroll_abandoned2 <- 
+						pre_scroll %>% 
+						html_nodes(".event") %>% 
+						html_text() %>% 
+						as_tibble() %>% 
+						mutate(value = tolower(value)) %>% 
+						dplyr::filter(grepl("abandon", value)) %>% 
+						nrow()>0
+					
+					pre_scroll_no_result <- 
+						pre_scroll %>% 
+						html_nodes(".event-full-width") %>% 
+						html_text() %>% 
+						as_tibble() %>% 
+						mutate(value = tolower(value)) %>% 
+						dplyr::filter(grepl("no result", value)) %>% 
+						nrow()>0
+					
+					if(pre_scroll_empty == TRUE){
+						print("This commentary doesn't exist")
+					}else if(pre_scroll_abandoned==TRUE){
+						print("This match was abandoned")
+					}else if(pre_scroll_abandoned2==TRUE){
+						print("This match was abandoned")
+					}else if(pre_scroll_no_result==TRUE){
+						print("This match has no result")
+					}else{
+						inning_buttons_names <- 
+							pre_scroll %>% 
+							html_nodes(".team-name") %>% 
+							html_text() %>% 
+							as_tibble()
+						
+						inning1_button_name <- 
+							paste("//div/div/div[contains(text(),", 
+										"'", 
+										inning_buttons_names %>% 
+											slice(1) %>% 
+											pull(),
+										" Innings'", 
+										")]", 
+										sep = "")
+						
+						inning2_button_name <- 
+							paste("//div/div/div[contains(text(),", 
+										"'", 
+										inning_buttons_names %>% 
+											slice(2) %>% 
+											pull(),
+										" Innings'", 
+										")]", 
+										sep = "")
+						
+						inning_button_name <- 
+							paste("//div/div/div/div[contains(text(),", 
+										"'", 
+										"Innings",
+										"'", 
+										")]", 
+										sep = "")
+						
+						webpage_body <- 
+							"//span[contains(text(),  'end of over')]"
+						
+						element <- remDr$findElement(using = "xpath", inning_button_name)
+						element$clickElement()
+						Sys.sleep(5)
+						element <- remDr$findElement(using = "xpath", inning2_button_name)
+						element$clickElement()
+						Sys.sleep(5)
+						# remDr$screenshot(display = TRUE)
+						element <- remDr$findElement(using = "xpath", webpage_body)
+						element$clickElement()
+						Sys.sleep(5)
+						# remDr$screenshot(display = TRUE)
+						webElem <- remDr$findElement("css", "body")
+						
+						print("Scrolling down")
+						for(k in 1:scroll_number){
+							webElem$sendKeysToElement(list(key = "end"))
+							Sys.sleep(2)
+							print(k)
+						}
+						remDr$screenshot(display = TRUE)
+						
+						page_source<-remDr$getPageSource()
+						inning2_html <- read_html(page_source[[1]])
+						write_xml(inning2_html, file = commentary_path_2)
+						master_commentary_spreadsheet$inning_2_commentary[i] <- commentary_path_2
+						write_csv(master_commentary_spreadsheet, year_master_commentary_spreadsheet_path)
+						
+					}
+					remDr$close()
+				}else{
+					print("Inning 2 has already been scraped")
+					master_commentary_spreadsheet$inning_2_commentary[i] <- commentary_path_2
+					write_csv(master_commentary_spreadsheet, year_master_commentary_spreadsheet_path)
+				}
+				master_commentary_spreadsheet$commentary_scraped[i] <- "yes"
+				write_csv(master_commentary_spreadsheet, year_master_commentary_spreadsheet_path)
+			}else{
+				# If the scraper breaks, or when scraping tournaments from the current year, it will pass
+				# over games you have already scraped. 
+				game_name <- 
+					master_commentary_spreadsheet %>%
+					slice(i) %>%
+					dplyr::select(scorecard_link) %>%
+					pull() 
+				print(paste(master_commentary_spreadsheet$tournament_name[i], 
+										", ", game_name, ", both innings have already been scraped ", sep = ""))
+			}
+		}else{
+			# Games that have not yet been played
+			game_name <- 
+				master_commentary_spreadsheet %>%
+				slice(i) %>%
+				dplyr::select(scorecard_link) %>%
+				pull() 
+			print(paste(master_commentary_spreadsheet$tournament_name[i], 
+									", ", game_name, ", will be available on ", this_row$ending_date, sep = ""))
+		}
+		
+	}
 }
+
+
+
+
