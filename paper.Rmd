@@ -1,12 +1,12 @@
 ---
-title: "Catchy title here"
+title: "waRne - Putting cricket analytics in a spin"
 authors: Robert(1), James (2)
 output: 
   html_document:
     toc: true
     toc_float: true
     keep_md: true
-bibliography: references.bib
+
 ---
 
 ```{r setup, include=FALSE}
@@ -24,22 +24,39 @@ library(patchwork)
 
 ```
 
-## R Markdown
+## Abstract
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+The importance of reproducibility, and the related issue of open access to data, has received a lot of recent attention. Momentum on these issues is gathering in the sports analytics community. While cricket is the second largest commercial sport in the world, unlike other popular international sports, there has been no mechanism for the public to access comprehensive statistics on players and teams. Expert commentary currently relies heavily on data that isn't made readily accessible and this produces an unnecessary barrier for the development of an inclusive sports analytics community.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+## Introduction
 
-```{r cars}
-summary(cars)
-```
+## What is waRne
 
-## Including Plots
+We need to think about what it is waRne should be?
 
-You can also embed plots, for example:
+1.  provide the csv we used for datajam and then people just add games to it
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+2.  people can not have the csv but just download random tournaments
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Why cricket needs reproducibility
+
+maybe include stuff around cricviz interesting tweets but fans can recreate or investigate further.
+
+## Cool cricket examples 
+
+-   Dhoni spin/pace/yorkr
+
+    -   shows off joins to player information and extracting information from play by play
+
+-   espncricinfo articles but instead of ipl do same tables for big bash
+
+-   recreate stats from espncricinfo like this [page](https://www.espncricinfo.com/series/19297/statistics/1187665/new-zealand-vs-england-1st-t20i-england-in-new-zealand-2019-20
+)
+
+| Things to do                 | person                                                                   |
+|------------------------------|--------------------------------------------------------------------------|
+| clean scrapers/csv for waRne | James                                                                    |
+| data dictionary              | Robert                                                                   |
+| examples                     | Robert - start (assume same csv being used) - cool cricket example stuff |
+
+: things to do
