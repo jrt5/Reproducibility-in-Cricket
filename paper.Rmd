@@ -42,7 +42,7 @@ We need to think about what it is waRne should be?
 
 maybe include stuff around cricviz interesting tweets but fans can recreate or investigate further.
 
-James and I entered a reproducibility competition and the winning entry provided a statistic sort of a gateway into the importance of their ''project'' was was specifically in 2019 Australian Big Bash T20 season. The statistic given was in the 2019 big bash season teams that batted first won only $43$%$ of games. Thankfully we can try to reproduce that statistic now through the use of waRne
+James and I entered a reproducibility competition and the winning entry provided a statistic sort of a gateway into the importance of their ''project'' was was specifically in 2019 Australian Big Bash T20 season. The statistic given was in the 2019 big bash season teams that batted first won only $43$%\$ of games. Thankfully we can try to reproduce that statistic now through the use of waRne
 
 Wikipedia tells us that there were the following:
 
@@ -69,8 +69,9 @@ blah<-df%>%
 									distinct()
 # dataset doesn't contain duckworth lewis results. 
 table(blah$year,blah$binary_result)
-````
 ```
+
+\`\`\`
 
 So here we can see that we in the big bash season 2018-19 we have a current winning percentage batting first of 22/(22+33) =0.4 but this doesn't include the duckworth lewis games or the washed out completely game.
 
@@ -142,10 +143,18 @@ Then from here we have to add on games in the 2019-2020 big bash season that wer
 +--------------------+-------------------------+---------------------------------------+--------------------------+
 | 31st december 2019 | thunder vs strikers     | thunder by 3 runs                     | batting first            |
 +--------------------+-------------------------+---------------------------------------+--------------------------+
-|                    |                         |                                       |                          |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
 
 : Games played in 2019 of the 2019-20 Big Bash
+
+12 batting first and 3 batting second
+
+(16+12)/(12+3+22+33-14)
+
+So over the past 2 years (not including DLS) we have
+
+(22+39)/(20+39+33+22)
+
+i.e. \>50% of teams win chasing so what does that mean?
 
 ## Cool cricket examples
 
