@@ -73,6 +73,8 @@ For example we can explore do teams win more often when chasing in the big bash 
 # insert above plots here
 ```
 
+## Using waRne to teach undergraduate statistics
+
 We can also use waRne and other R packages as an easy way to engage students in learning statistical concepts.
 
 For example using the above we can not only look at the answers graphically, but we can run a statistical test. The example we would use is instead of testing is a coin biased (different from 50/50) we can test to see if the winning \\% is different from $0.5$ for teams chasing.
@@ -204,19 +206,6 @@ Without an easy accessible medium how can crickets version of an analytics commu
 
 something something look towards how EPA has changed the way fans are engaged in NFL analytics - so maybe the change in run rate can be like EPA?
 
-```{r}
-library(tidyverse)
-df<-read.csv("data/combined_2020_09_11.csv")
-
-df%>%
-	group_by(match_id)%>%
-	filter(inning==2)%>%
-	group_by()
-	
-
-
-```
-
 ## Cool cricket examples
 
 -   Dhoni spin/pace/yorkr
@@ -240,3 +229,23 @@ df%>%
 ## Dhoni Dilemma
 
 With this new dataset, we allow fans to put on their analyst thats and to be able to ask themselves, what exactly makes a good closer and what exactly is the Dhoni Dilemma.
+
+To understand the Dhoni Deilemma, we need to see some interesting things to do with the change in RRR.
+
+Cricket is an obvious sort of sport, to win in the end you have to get one run more than your opposition. A commonly used statistic during the broadcast is the required run rate, for example if you need 120 to win off 20 overs your RRR is \$6\$ runs an over
+
+What follows is then obvious is the chasing team wins if they are able to lower the RRR that is score quicker.
+
+Espncricinfo did article on teams that win games get a higher proportion of their runs in the powerplay and first 10 overs. But proportion of team runs in T20 games doesn't really make sense as a batting metric as we are not just concerned with how many runs they get, but how quickly they get them. So we introduce a new way to measure batsman change in RRR.
+
+```{r}
+# graph of powerplay
+```
+
+This graph makes sense as we can see the best openers in the world lower the required run rate so whats the Dhoni Dilemma?
+
+```{r}
+# middle overs (enter in the middle)
+```
+
+Dhoni is renowed for being one of the worlds best closers but we can see it seems as though in the middle he is letting the game get out of hand. How can one of the worlds best closers
