@@ -62,7 +62,25 @@ library(tidyverse)
 	
 ```
 
-Another reason why is that cricket is a weird sport with a lot of old school rules of thumb
+Another reason why is that cricket is a weird sport with a lot of old school rules of thumb that are followed/talked about.
+
+For example it has become popular conjecture that its better that teams should bat second (chase down a total set by the oppoition). Through waRne we can answer such question for the T20 game.
+
+For example we can explore do teams win more often when chasing in the big bash over the history of the big bash, or we can plot a line chart to see if there is a movement towards batting last and winning.
+
+```{r}
+
+# insert above plots here
+```
+
+We can also use waRne and other R packages as an easy way to engage students in learning statistical concepts.
+
+For example using the above we can not only look at the answers graphically, but we can run a statistical test. The example we would use is instead of testing is a coin biased (different from 50/50) we can test to see if the winning \\% is different from $0.5$ for teams chasing.
+
+```{r}
+
+
+```
 
 James and I entered a reproducibility competition and the winning entry provided a statistic sort of a gateway into the importance of their ''project'' was was specifically in 2019 Australian Big Bash T20 season. The statistic given was in the 2019 big bash season teams that batted first won only $43$% of games. Thankfully we can try to reproduce that statistic now through the use of waRne
 
