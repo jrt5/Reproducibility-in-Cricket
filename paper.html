@@ -11,7 +11,7 @@
 
 
 
-<title>Catchy title here</title>
+<title>waRne - Putting cricket analytics in a spin</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1521,14 +1521,378 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Catchy title here</h1>
+<h1 class="title toc-ignore">waRne - Putting cricket analytics in a spin</h1>
 
 </div>
 
 
-<div id="warne---putting-cricket-analytics-in-a-spin" class="section level2">
-<h2>waRne - Putting cricket analytics in a spin</h2>
+<div id="abstract" class="section level2">
+<h2>Abstract</h2>
 <p>The importance of reproducibility, and the related issue of open access to data, has received a lot of recent attention. Momentum on these issues is gathering in the sports analytics community. While cricket is the second largest commercial sport in the world, unlike other popular international sports, there has been no mechanism for the public to access comprehensive statistics on players and teams. Expert commentary currently relies heavily on data that isn’t made readily accessible and this produces an unnecessary barrier for the development of an inclusive sports analytics community.</p>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Data access is a key enabler for any analytics community. Most major sports have easy access to match statistics, for example <a href="https://github.com/abresler/nbastatR">nbastatR</a> for NBA, <a href="https://cran.r-project.org/web/packages/Lahman/Lahman.pdf">Lahman</a> for baseball, <a href="https://github.com/skoval/deuce">deuce</a> for tennis and <a href="https://github.com/mrcaseb/nflfastR">nflfastR</a> for NFL. Through access to sports data and reproducible findings and metrics fans clubs and researchers are better able to understand the game, predict match outcomes and rate players. For example the way teams tackled 4th down decisions through <span class="citation">(Romer 2006)</span></p>
+</div>
+<div id="what-is-warne" class="section level2">
+<h2>What is waRne</h2>
+</div>
+<div id="why-cricket-needs-reproducibility" class="section level2">
+<h2>Why cricket needs reproducibility</h2>
+<p>maybe include stuff around cricviz interesting tweets but fans can recreate or investigate further.</p>
+<p>James and I entered a reproducibility competition and the winning entry provided a statistic sort of a gateway into the importance of their ‘’project’’ was was specifically in 2019 Australian Big Bash T20 season. The statistic given was in the 2019 big bash season teams that batted first won only <span class="math inline">\(43\)</span>% of games. Thankfully we can try to reproduce that statistic now through the use of waRne</p>
+<p>Wikipedia tells us that there were the following:</p>
+<p>In the 2018-19 Big Bash League there were 59 matches played. Of which we had 3 DLS results.</p>
+<table>
+<caption>Games under consideration in 2018-19 Big Bash</caption>
+<thead>
+<tr class="header">
+<th>Games</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>21 DEC 2018 - THUNDER VS STARS</td>
+<td>THUNDER WON BY 15 RUNS (D/L)</td>
+</tr>
+<tr class="even">
+<td>2 FEB 2019 - THUNDER VS SIXERS</td>
+<td>SIXERS WON BY 9 WICKETS (D/L)</td>
+</tr>
+<tr class="odd">
+<td>8 JAN 2019 HEAT VS THUNDER</td>
+<td>HEAT BY 15 RUNS (D/L)</td>
+</tr>
+<tr class="even">
+<td>17th January 2019 Thunder vs Heat</td>
+<td>no result</td>
+</tr>
+</tbody>
+</table>
+<pre><code>##           
+##             0  1
+##   20102011  8 11
+##   20112012 10 18
+##   20122013 17 13
+##   20132014 13 18
+##   20142015 15 17
+##   20152016 19 15
+##   20162017 19 11
+##   20172018 18 20
+##   20182019 33 22
+##   20192020 20 39</code></pre>
+<p>```</p>
+<p>So here we can see that we in the big bash season 2018-19 we have a current winning percentage batting first of 22/(22+33) =0.4 but this doesn’t include the duckworth lewis games or the washed out completely game.</p>
+<p>If we were to add in the duckworth lewis games we get 24/(24+34) which is equal to 0.414. Which isn’t the result.</p>
+<p>We can also clearly see that in the 20192020 big bash season the team batting first wins 39/(39+20) or 0.66 so what could be going on? Did Quantium mean only games played in the actual year 2019?</p>
+<p>In that case from the 2018-2019 season we would remove the following games</p>
+<table>
+<caption>Games in 2018 of the 2018-19 Big Bash Season</caption>
+<thead>
+<tr class="header">
+<th>Date</th>
+<th>Game</th>
+<th>Result</th>
+<th>Winning Team</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>19 December 2018</td>
+<td>Heat Vs Strickers</td>
+<td>Strickers 5 Wickets</td>
+<td>Chased</td>
+</tr>
+<tr class="even">
+<td>20th December 2018</td>
+<td>Scorchers Vs Renegades</td>
+<td>Renegades by 4 wickets</td>
+<td>Chased</td>
+</tr>
+<tr class="odd">
+<td>21 December 2018</td>
+<td>Thunder vs Stars</td>
+<td>Thunder by 15 runs (D/L)</td>
+<td>Batted First</td>
+</tr>
+<tr class="even">
+<td>22 December 2018</td>
+<td>Sixers vs Scorchers</td>
+<td>Sixers by 17 runs</td>
+<td>Batted First</td>
+</tr>
+<tr class="odd">
+<td>22 December</td>
+<td>Hurricanes vs Heat</td>
+<td>Hurricanes by 15 runs</td>
+<td>Batted First</td>
+</tr>
+<tr class="even">
+<td>23 December 2018</td>
+<td>Strikers vs Renegades</td>
+<td>Renegades by 5 wickets</td>
+<td>Chased</td>
+</tr>
+<tr class="odd">
+<td>24 December 2018</td>
+<td>Stars vs Hurricanes</td>
+<td>Hurricanes by 6 wickets</td>
+<td>Chased</td>
+</tr>
+<tr class="even">
+<td>24th December 2018</td>
+<td>Thunder vs sixers</td>
+<td>Thunder by 21 runs</td>
+<td>Batted First</td>
+</tr>
+<tr class="odd">
+<td>26th December 2018</td>
+<td>Strickers vs scorchers</td>
+<td>Scorchers by 7 wickets</td>
+<td>Chased</td>
+</tr>
+<tr class="even">
+<td>27th December</td>
+<td>Sixers vs Stars</td>
+<td>stars by 5 wickets</td>
+<td>Chased</td>
+</tr>
+<tr class="odd">
+<td>28th December</td>
+<td>thunder vs hurricanes</td>
+<td>hurricanes by 7 wickets</td>
+<td>Chased</td>
+</tr>
+<tr class="even">
+<td>29th december</td>
+<td>sixers vs renegades</td>
+<td>sixers by 33 runs</td>
+<td>Batted First</td>
+</tr>
+<tr class="odd">
+<td>30th decemeber 2018</td>
+<td>scorchers vs hurricanes</td>
+<td>hurricanes by 6 wickets</td>
+<td>Chased</td>
+</tr>
+<tr class="even">
+<td>31st decemember 2018</td>
+<td>strickers vs thunder</td>
+<td>strickers by 20 runs</td>
+<td>Batted First</td>
+</tr>
+</tbody>
+</table>
+<p>i.e. we remove 14 games here of which 6 teams won batting first 16/(22+33-14)</p>
+<p>Then from here we have to add on games in the 2019-2020 big bash season that were played in 2019</p>
+<table style="width:100%;">
+<caption>Games played in 2019 of the 2019-20 Big Bash</caption>
+<colgroup>
+<col width="18%"></col>
+<col width="22%"></col>
+<col width="35%"></col>
+<col width="23%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Date</th>
+<th>Teams</th>
+<th>Result</th>
+<th>Winning Team</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>17 December</td>
+<td>Thunder vs Heat</td>
+<td>Thunder by 29 runs</td>
+<td>Batted First</td>
+</tr>
+<tr class="even">
+<td>18th December</td>
+<td>Scorchers vs Sixers</td>
+<td>Sixers by 8 wickets</td>
+<td>Chased</td>
+</tr>
+<tr class="odd">
+<td>19th december</td>
+<td>Renegades vs thunder</td>
+<td>thunder by 6 wickets</td>
+<td>chased</td>
+</tr>
+<tr class="even">
+<td>20th decemeber</td>
+<td>hurricanes vs sixers</td>
+<td>hurricanes by 25 runs</td>
+<td>batted first</td>
+</tr>
+<tr class="odd">
+<td>20th decemember</td>
+<td>stars vs heat</td>
+<td>stars by 22 runs</td>
+<td>batting first</td>
+</tr>
+<tr class="even">
+<td>21st decemember</td>
+<td>strickers vs thunder</td>
+<td>no result</td>
+<td>no result</td>
+</tr>
+<tr class="odd">
+<td>21st december</td>
+<td>scorchers vs renegades</td>
+<td>scorchers by 11 runs</td>
+<td>batting first</td>
+</tr>
+<tr class="even">
+<td>22 deceember</td>
+<td>stars vs hurricanes</td>
+<td>stars by 52 runs</td>
+<td>batting first</td>
+</tr>
+<tr class="odd">
+<td>22 decemember</td>
+<td>heat vs sixers</td>
+<td>heat by 48 runs</td>
+<td>batting first</td>
+</tr>
+<tr class="even">
+<td>23 dec</td>
+<td>strickers vs scorchers</td>
+<td>strickers by 15 (DLS)</td>
+<td>batting first</td>
+</tr>
+<tr class="odd">
+<td>24th dec</td>
+<td>renegades vs hurricanes</td>
+<td>hurricanes by 7 wickets</td>
+<td>chased</td>
+</tr>
+<tr class="even">
+<td>26 decemember</td>
+<td>sixers vs scorchers</td>
+<td>sixers by 48 runs</td>
+<td>batting first</td>
+</tr>
+<tr class="odd">
+<td>27 dec</td>
+<td>strickers vs stars</td>
+<td>strikers by 5 runs</td>
+<td>batting first</td>
+</tr>
+<tr class="even">
+<td>28th december</td>
+<td>thunder vs sixers</td>
+<td>sixers won super over (batting first)</td>
+<td><p>sixers by superover</p>
+<p>or sixers batting second</p></td>
+</tr>
+<tr class="odd">
+<td>29th dec</td>
+<td>strikers vs renegades</td>
+<td>strikers by 18 runs</td>
+<td>batting first</td>
+</tr>
+<tr class="even">
+<td>30th dec</td>
+<td>hurricanes vs stars</td>
+<td>stars by 4 runs (DLS)</td>
+<td>batting first</td>
+</tr>
+<tr class="odd">
+<td>31st december 2019</td>
+<td>thunder vs strikers</td>
+<td>thunder by 3 runs</td>
+<td>batting first</td>
+</tr>
+</tbody>
+</table>
+<p>12 batting first and 3 batting second</p>
+<p>(16+12)/(12+3+22+33-14)</p>
+<p>So over the past 2 years (not including DLS) we have</p>
+<p>(22+39)/(20+39+33+22)</p>
+<p>i.e. &gt;50% of teams win chasing so what does that mean?</p>
+</div>
+<div id="easier-engagement-of-fans" class="section level2">
+<h2>Easier engagement of fans</h2>
+<p>To the surprise of many, its hard to engage cricket fans into the analytics behind the game. Reasons for this are generally centred around reproducibility and explainability to fans.</p>
+<p>Without an easy accessible medium how can crickets version of an analytics community grow.</p>
+<p>something something look towards how EPA has changed the way fans are engaged in NFL analytics - so maybe the change in run rate can be like EPA?</p>
+<pre><code>## # A tibble: 831,409 x 50
+##    match_id inning  over extra_runs earned_runs  runs wicket wickets_taken
+##       &lt;int&gt;  &lt;int&gt; &lt;dbl&gt;      &lt;int&gt;       &lt;int&gt; &lt;int&gt; &lt;lgl&gt;          &lt;int&gt;
+##  1   439151      2   0.1          0           0     0 FALSE              0
+##  2   439150      2   0.1          0           0     0 FALSE              0
+##  3   439149      2   0.1          0           0     0 FALSE              0
+##  4   439148      2   0.1          0           0     0 FALSE              0
+##  5   452152      2   0.1          0           1     1 FALSE              0
+##  6   452151      2   0.1          1           0     1 FALSE              0
+##  7   452151      2   0.1          0           0     1 FALSE              0
+##  8   452150      2   0.1          0           0     0 FALSE              0
+##  9   452149      2   0.1          0           0     0 FALSE              0
+## 10   452148      2   0.1          4           0     4 FALSE              0
+## # … with 831,399 more rows, and 42 more variables: scorecard_link &lt;chr&gt;,
+## #   batsman_name &lt;chr&gt;, bowler_name &lt;chr&gt;, extra &lt;chr&gt;, team &lt;chr&gt;,
+## #   target &lt;int&gt;, play_description &lt;chr&gt;, batsman &lt;chr&gt;, bowler &lt;chr&gt;,
+## #   wicket_description &lt;chr&gt;, year &lt;int&gt;, tournament_type &lt;chr&gt;,
+## #   tournament_name &lt;chr&gt;, inning_total &lt;chr&gt;, rpo &lt;dbl&gt;, total &lt;int&gt;,
+## #   duckworth_lewis &lt;lgl&gt;, match_summary &lt;chr&gt;, batsman_links &lt;chr&gt;,
+## #   batsman_id &lt;int&gt;, bowler_links &lt;chr&gt;, bowler_id &lt;int&gt;, batting_order &lt;int&gt;,
+## #   batting_team_result &lt;chr&gt;, bucketed_over &lt;int&gt;, ball_in_over &lt;dbl&gt;,
+## #   starting_required_run_rate &lt;dbl&gt;, balls_remaining &lt;int&gt;, resources &lt;dbl&gt;,
+## #   runs_required &lt;int&gt;, previous_runs_required &lt;int&gt;,
+## #   previous_dls_resources_remain &lt;dbl&gt;, r0 &lt;dbl&gt;, r1 &lt;dbl&gt;, r1_over_r0 &lt;dbl&gt;,
+## #   r0_over_r1 &lt;dbl&gt;, binary_result &lt;int&gt;, required_run_rate &lt;dbl&gt;,
+## #   previous_required_run_rate &lt;dbl&gt;, change_in_requireed_run_rate &lt;dbl&gt;,
+## #   batsman_balls_faced_this_match &lt;int&gt;,
+## #   bowler_balls_delivererd_this_match &lt;int&gt;</code></pre>
+</div>
+<div id="cool-cricket-examples" class="section level2">
+<h2>Cool cricket examples</h2>
+<ul>
+<li><p>Dhoni spin/pace/yorkr</p>
+<ul>
+<li>shows off joins to player information and extracting information from play by play</li>
+</ul></li>
+<li><p>espncricinfo articles but instead of ipl do same tables for big bash</p></li>
+<li><p>recreate stats from espncricinfo like this <a href="https://www.espncricinfo.com/series/19297/statistics/1187665/new-zealand-vs-england-1st-t20i-england-in-new-zealand-2019-20">page</a></p></li>
+</ul>
+<table>
+<colgroup>
+<col width="29%"></col>
+<col width="70%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Things to do</th>
+<th>person</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>clean scrapers/csv for waRne</td>
+<td>James</td>
+</tr>
+<tr class="even">
+<td>data dictionary</td>
+<td>Robert</td>
+</tr>
+<tr class="odd">
+<td>examples</td>
+<td>Robert - start (assume same csv being used) - cool cricket example stuff</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="dhoni-dilemma" class="section level2">
+<h2>Dhoni Dilemma</h2>
+<p>With this new dataset, we allow fans to put on their analyst thats and to be able to ask themselves, what exactly makes a good closer and what exactly is the Dhoni Dilemma.</p>
+<div id="refs" class="references hanging-indent">
+<div id="ref-romer2006firms">
+<p>Romer, David. 2006. “Do Firms Maximize? Evidence from Professional Football.” <em>Journal of Political Economy</em> 114 (2): 340–65.</p>
+</div>
+</div>
 </div>
 
 
