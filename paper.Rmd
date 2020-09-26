@@ -45,7 +45,9 @@ Data accessibility enables fans, analyts and researchers to better understand th
 
 Through being able to reproduce, fans are able to make accessible findings for others and importantly they are able to extend and grow concepts. Unfortuntely what we see through leading cricket analytics providers is a track record of confusing output for fans. This can lead to lower engagement and dismissial of cricket analytics.
 
-maybe include stuff around cricviz interesting tweets but fans can recreate or investigate further.
+For example in this [series of tweets](https://twitter.com/benjonescricket/status/1219898578719723520) we see the narrative being pushed that Steve Smith is a good player vs pace bowling unfortunetly just a few months prior the same company and journalist published an article which had Steve Smith doing much worse against pace (balls above 140km/h). Unlike a similar sport baseball, fans have no easily accisible way of seeing if Steve Smith vs pace is a strength as alluded to in the original tweet, or a weakness like the same persons published online article. In comparsion, fans are able to get a breakdown of Mike Trout vs fastballs from using [baseballr](https://billpetti.github.io/2018-02-19-build-statcast-database-rstats/) which provides access through statcast data from [baseballsavant]([https://baseballsavant.mlb.com)](https://baseballsavant.mlb.com)) .
+
+Unfortunetly this is just one of many examples whereby a relatively simple statistic is provided by media and fans have no mechanism to fact check.
 
 James and I entered a reproducibility competition and the winning entry provided a statistic sort of a gateway into the importance of their ''project'' was was specifically in 2019 Australian Big Bash T20 season. The statistic given was in the 2019 big bash season teams that batted first won only $43$% of games. Thankfully we can try to reproduce that statistic now through the use of waRne
 

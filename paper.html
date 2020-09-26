@@ -1532,14 +1532,16 @@ div.tocify {
 </div>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>Data access is a key enabler for any analytics community. Most major sports have easy access to match statistics, for example <a href="https://github.com/abresler/nbastatR">nbastatR</a> for NBA, <a href="https://cran.r-project.org/web/packages/Lahman/Lahman.pdf">Lahman</a> for baseball, <a href="https://github.com/skoval/deuce">deuce</a> for tennis and <a href="https://github.com/mrcaseb/nflfastR">nflfastR</a> for NFL. Through access to sports data and reproducible findings and metrics fans clubs and researchers are better able to understand the game, predict match outcomes and rate players. For example the way teams tackled 4th down decisions through <span class="citation">(Romer 2006)</span></p>
-</div>
-<div id="what-is-warne" class="section level2">
-<h2>What is waRne</h2>
+<p>Data access is a key enabler for any analytics community. Most major sports have easy access to match statistics, for example <a href="https://github.com/abresler/nbastatR">nbastatR</a> for NBA, <a href="https://cran.r-project.org/web/packages/Lahman/Lahman.pdf">Lahman</a> for baseball, <a href="https://github.com/skoval/deuce">deuce</a> for tennis and <a href="https://github.com/mrcaseb/nflfastR">nflfastR</a> for NFL. Through access to sports data and reproducible findings and metrics fans clubs and researchers are better able to understand the game, predict match outcomes and rate players. For example the way teams tackled 4th down decisions in the NFL has changed since <span class="citation">(Romer 2006)</span> seminial work. As teams have changed their 4th down decision making this allows follow up research such as <span class="citation">(Yam and Lopez 2019)</span> which looked at more granular data to see if this happens in practice.</p>
+<p>By making data more accessible and more advanced metrics more accessible fans data journalism in sports has grown in recent years. For example in <span class="citation">(Horowitz, Yurko, and Ventura 2017)</span> has enabled EPA to enter popular discussion among fans.</p>
+<p>Cricket is the second largest sport in the world. However, unfortunetaly there is no easy accessible way to access ball by ball data nor aggregated statistics of teams and players. Data while available on sites like <a href="https://www.espncricinfo.com/">espncricinfo</a> are not in an easy to use form. For example, each match is listed on different webpages so hours upon hours of time would be required to copy and paste a single season. Hence, there are significant logistical barriers for prospective fans and analysts studying the game, which stagnats understanding of cricket.</p>
+<p>This paper describes the waRne package, the first to provide free and easy access to data for cricket for fans. Web scraping tools are avaiable for fans to easily scrape the play by play commentary data on espncricinfo. For the first time fans can evaluate their favourite teams and players and do so in a reproducible and accessible manner.</p>
 </div>
 <div id="why-cricket-needs-reproducibility" class="section level2">
 <h2>Why cricket needs reproducibility</h2>
-<p>maybe include stuff around cricviz interesting tweets but fans can recreate or investigate further.</p>
+<p>Data accessibility enables fans, analyts and researchers to better understand the game. Through being able to reproduce common popular metrics, visualisations and article findings.</p>
+<p>Through being able to reproduce, fans are able to make accessible findings for others and importantly they are able to extend and grow concepts. Unfortuntely what we see through leading cricket analytics providers is a track record of confusing output for fans. This can lead to lower engagement and dismissial of cricket analytics.</p>
+<p>For example in this <a href="https://twitter.com/benjonescricket/status/1219898578719723520">series of tweets</a> we see the narrative being pushed that Steve Smith is a good player vs pace bowling unfortunetly just a few months prior the same company and journalist published an article which had Steve Smith doing much worse against pace (balls above 140km/h). Unlike a similar sport baseball, fans have no easily accisible way of seeing if Steve Smith vs pace is a strength as alluded to in the original tweet, or a weakness like the same persons published online article. In comparsion, fans are able to get a breakdown of Mike Trout vs fastballs from using <a href="https://billpetti.github.io/2018-02-19-build-statcast-database-rstats/">baseballr</a> which provides access through statcast data from <a href="%5Bhttps://baseballsavant.mlb.com%5D(https://baseballsavant.mlb.com/statcast_search?hfPT=&amp;hfAB=&amp;hfBBT=&amp;hfPR=&amp;hfZ=&amp;stadium=&amp;hfBBL=&amp;hfNewZones=&amp;hfGT=R%7C&amp;hfC=00%7C&amp;hfSea=2019%7C2018%7C2017%7C2016%7C2015%7C&amp;hfSit=&amp;player_type=batter&amp;hfOuts=&amp;opponent=&amp;pitcher_throws=&amp;batter_stands=&amp;hfSA=&amp;game_date_gt=&amp;game_date_lt=&amp;hfInfield=&amp;team=&amp;position=&amp;hfOutfield=&amp;hfRO=&amp;home_road=&amp;hfFlag=&amp;hfPull=&amp;metric_1=&amp;hfInn=&amp;min_pitches=100&amp;min_results=0&amp;group_by=name&amp;sort_col=pitches&amp;player_event_sort=h_launch_speed&amp;sort_order=desc&amp;min_pas=0#results)">baseballsavant</a></p>
 <p>James and I entered a reproducibility competition and the winning entry provided a statistic sort of a gateway into the importance of their ‘’project’’ was was specifically in 2019 Australian Big Bash T20 season. The statistic given was in the 2019 big bash season teams that batted first won only <span class="math inline">\(43\)</span>% of games. Thankfully we can try to reproduce that statistic now through the use of waRne</p>
 <p>Wikipedia tells us that there were the following:</p>
 <p>In the 2018-19 Big Bash League there were 59 matches played. Of which we had 3 DLS results.</p>
@@ -1889,8 +1891,14 @@ div.tocify {
 <h2>Dhoni Dilemma</h2>
 <p>With this new dataset, we allow fans to put on their analyst thats and to be able to ask themselves, what exactly makes a good closer and what exactly is the Dhoni Dilemma.</p>
 <div id="refs" class="references hanging-indent">
+<div id="ref-horowitz2017nflscrapr">
+<p>Horowitz, Maksim, Ron Yurko, and Samuel L Ventura. 2017. “NflscrapR: Compiling the Nfl Play-by-Play Api for Easy Use in R.” <em>URL Https://Github. Com/Maksimhorowitz/nflscrapR, R Package Version</em> 1 (0).</p>
+</div>
 <div id="ref-romer2006firms">
 <p>Romer, David. 2006. “Do Firms Maximize? Evidence from Professional Football.” <em>Journal of Political Economy</em> 114 (2): 340–65.</p>
+</div>
+<div id="ref-yam2019lost">
+<p>Yam, Derrick R, and Michael J Lopez. 2019. “What Was Lost? A Causal Estimate of Fourth down Behavior in the National Football League.” <em>Journal of Sports Analytics</em> 5 (3): 153–67.</p>
 </div>
 </div>
 </div>
