@@ -47,7 +47,22 @@ Through being able to reproduce, fans are able to make accessible findings for o
 
 For example in this [series of tweets](https://twitter.com/benjonescricket/status/1219898578719723520) we see the narrative being pushed that Steve Smith is a good player vs pace bowling unfortunetly just a few months prior the same company and journalist published an article which had Steve Smith doing much worse against pace (balls above 140km/h). Unlike a similar sport baseball, fans have no easily accisible way of seeing if Steve Smith vs pace is a strength as alluded to in the original tweet, or a weakness like the same persons published online article. In comparsion, fans are able to get a breakdown of Mike Trout vs fastballs from using [baseballr](https://billpetti.github.io/2018-02-19-build-statcast-database-rstats/) which provides access through statcast data from [baseballsavant]([https://baseballsavant.mlb.com)](https://baseballsavant.mlb.com)) .
 
-Unfortunetly this is just one of many examples whereby a relatively simple statistic is provided by media and fans have no mechanism to fact check. Fact checking is an important avenue for fans to not only engage and understand statistics, but having
+Unfortunetly this is just one of many examples whereby a relatively simple statistic is provided by media and fans have no mechanism to fact check. Fact checking is an important avenue for fans to not only engage and understand statistics, but having this mechanism also stops analytics companies from putting out misleading conclusions and findings.
+
+However though using waRne we are able to not only compare Steve Smiths performance vs bowling type but we are able to easily compare Steve Smiths performance vs bowling types with other players.
+
+### Steve Smith vs Bowling Type Chart
+
+James here need to figure out the code, do we keep it seperate so in the example we still have to join on bowling type to the ball by ball, or will it just be an extra column joined already.
+
+```{r}
+library(tidyverse)
+
+# steve smith vs pace graph
+	
+```
+
+Another reason why is that cricket is a weird sport with a lot of old school rules of thumb
 
 James and I entered a reproducibility competition and the winning entry provided a statistic sort of a gateway into the importance of their ''project'' was was specifically in 2019 Australian Big Bash T20 season. The statistic given was in the 2019 big bash season teams that batted first won only $43$% of games. Thankfully we can try to reproduce that statistic now through the use of waRne
 
