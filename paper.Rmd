@@ -249,3 +249,15 @@ This graph makes sense as we can see the best openers in the world lower the req
 ```
 
 Dhoni is renowed for being one of the worlds best closers but we can see it seems as though in the middle he is letting the game get out of hand. How can one of the worlds best closers
+
+## notes for James
+
+So I don't think its like a complex paper, because of the way cricket is at the moment I think the biggest influence this stuff can make is
+
+-   being able to fact check
+
+-   having batsman metrics that are beyond average, total runs and SR
+
+-   What we can maybe mention? is that change in RRR while simple seems to be quite effective, a better measurement would be the DLS which we know can be derived from the ball by ball data or alternatively if someone has a resource table they can instead of change in RRR use change in resources or whatever
+
+For the examples, I think its pretty easy to get the graphs to look nice, its more about whats the dataset look like? i.e. do we need the first few lines for reproducibility to be joins or is it sort of like done already
