@@ -2,7 +2,7 @@
 
 ## Package Overview
 
-waRne is contains the play-by-play data from T20 and ODI cricket matches, and in the future will contain Test play-by-play data as well. We have tested this out by scraping from the 2010 season to the 2019/2020 season on ESPNcricinfo.com, up to the September T20I series between Australia and England. Rather than leave the scraping code and force all cricket enthusiasts to scrape the data themselves, we have attached a dataset containing our scraped data, and the code for scraping more. Below is a guide for loading in the package, the data, and using the scraping functions. 
+waRne is contains the play-by-play data from T20 and ODI cricket matches, and in the future will contain Test play-by-play data as well. We have tested this out by scraping from the 2010 season to the 2019/2020 season on ESPNcricinfo.com, up to the September T20I series between Australia and England. Rather than leave the scraping code and force cricket enthusiasts to scrape the data themselves, we have attached a data set containing our scraped data, and the code for scraping more. Below is a guide for loading in the package, the data, and using the scraping functions. 
 
 We grabbed the play-by-play data and the personal webpages for all the players in our data set. Combining these datasets together is done by joining on the common player id in each. For example Steve Smith is represented by the numeric id 267192 in both data sets. 
 
@@ -14,6 +14,16 @@ library(devtools)
 install_github(jrt5/waRne)
 
 To install the 3 data sets, (better figure that out)
+
+## Adding New Data To The Existing Data Set
+
+It's simple, left join
+
+## Scraping New Data
+
+To scrape new data you will need to download docker. This is enable you to load webpages in containers, which allow for button selection and scrolling. This will be necessary as the commentary webpage requires scrolling and clicking of dropdown menus to load all the data for a given game. The various functions have been condensed into just a few easy to use scrapers, which will create the necessary folders for the data. All that is required is you keep an eye on the scraper, since cricinfo is inconsistent in many ways and it may be impossible to scrape certain series using the tools provided.
+
+Docker is available free at https://www.docker.com/
 
 There is the potential of a broken link affecting the scraper, causing it to stop. In this case, we simply leave the commentary and scorecard links on the master as NA values. If these specific links are important to you, it may be necessary to click each tournament within this broken tournament link on the season archive, and manually add the scorecard and commentary links into the master.csv
 
