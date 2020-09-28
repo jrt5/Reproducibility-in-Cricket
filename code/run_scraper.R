@@ -5,7 +5,7 @@ library(rvest)
 library(htmltools)
 library(lubridate)
 library(magrittr)
-source("/Users/James/James/Reproducibility-in-Cricket/code/scraping_functions.R")
+source("/Users/robertnguyen/Library/Mobile Documents/com~apple~CloudDocs/OneDrive/Reproducibility-in-Cricket/code/scraping_functions.R")
 
 # You will need to create an image to do this in docker
 # system('docker run -d -p 4445:4444 --shm-size 2g selenium/standalone-chrome')
@@ -17,7 +17,7 @@ system('docker run -d -p 4445:4444 --shm-size 2g selenium/standalone-chrome')
 # remove it for you. The links are printed for each 
 complete = 0
 while(complete!=1){
-	commentary <- try(grab_tournament_links(2018, "/Users/James/James/Reproducibility-in-Cricket"))
+	commentary <- try(grab_tournament_links(2018, "/Users/robertnguyen/Library/Mobile Documents/com~apple~CloudDocs/OneDrive/Reproducibility-in-Cricket"))
 	if(class(commentary)=="try-error"){
 		error_type <- attr(commentary, "condition")
 		print(class(error_type))
@@ -43,7 +43,7 @@ while(complete!=1){
 		print("503 error, taking a 2-4 minute break before trying again")
 		Sys.sleep(sample(120:240, 1))
 		complete <- 0
-	}else if(error_type$message == "object 'starting_date' not found"){
+	}else if(error_type$message == "x object 'starting_date' not found"){
 		print("I think it failed to get the results page loaded, 
           taking a 2-4 minute break before trying again")
 		Sys.sleep(sample(120:240, 1))
@@ -53,6 +53,10 @@ while(complete!=1){
           taking a 2-4 minute break before trying again")
 		Sys.sleep(sample(120:240, 1))
 		complete <- 0
+	}else if(error_type$message == "Problem with `mutate()` input `starting_date`.\n\033[31mx\033[39m object 'starting_date' not found\n\033[34mℹ\033[39m Input `starting_date` is `as.Date(starting_date)`."){
+		print("x object 'starting_date' not found")
+		Sys.sleep(sample(120:240, 1))
+		complete <- 0		
 	}else{
 		complete <- 1
 	}
