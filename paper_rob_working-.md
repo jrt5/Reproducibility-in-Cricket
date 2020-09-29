@@ -10,20 +10,9 @@ bibliography: references.bib
 
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(out.width = "75%",
-                      dev = "png",
-                      fig.align = "center",
-                      echo = FALSE)
-```
 
-```{r libraries, include=FALSE}
-library(tidyverse)
-library(naniar)
-library(visdat)
-library(patchwork)
 
-```
+
 
 ## Abstract
 
@@ -55,12 +44,7 @@ However though using waRne we are able to not only compare Steve Smiths performa
 
 James here need to figure out the code, do we keep it seperate so in the example we still have to join on bowling type to the ball by ball, or will it just be an extra column joined already.
 
-```{r}
-library(tidyverse)
 
-# steve smith vs pace graph
-	
-```
 
 Another reason why is that cricket is a weird sport with a lot of old school rules of thumb that are followed/talked about.
 
@@ -68,10 +52,7 @@ For example it has become popular conjecture that its better that teams should b
 
 For example we can explore do teams win more often when chasing in the big bash over the history of the big bash, or we can plot a line chart to see if there is a movement towards batting last and winning.
 
-```{r}
 
-# insert above plots here
-```
 
 ## Using waRne to teach undergraduate statistics
 
@@ -79,10 +60,7 @@ We can also use waRne and other R packages as an easy way to engage students in 
 
 For example using the above we can not only look at the answers graphically, but we can run a statistical test. The example we would use is instead of testing is a coin biased (different from 50/50) we can test to see if the winning \\% is different from $0.5$ for teams chasing.
 
-```{r}
 
-
-```
 
 James and I entered a reproducibility competition and the winning entry provided a statistic sort of a gateway into the importance of their ''project'' was was specifically in 2019 Australian Big Bash T20 season. The statistic given was in the 2019 big bash season teams that batted first won only $43$% of games. Thankfully we can try to reproduce that statistic now through the use of waRne
 
@@ -99,18 +77,20 @@ In the 2018-19 Big Bash League there were 59 matches played. Of which we had 3 D
 
 : Games under consideration in 2018-19 Big Bash
 
-```{r, investigation}
-df<-read.csv("data/combined_2020_09_11.csv")
 
-blah<-df%>%
-	dplyr::select(duckworth_lewis,year,match_id, tournament_name, tournament_type, team, inning, binary_result)%>%
-	dplyr::filter(tournament_type%in% c("Twenty20 Internationals", "Twenty20"  ))%>%
-	dplyr::filter(tournament_name%in% c("Twenty20 Big Bash","Big Bash League" ))%>%
-									dplyr::filter(inning==1)%>%
-									dplyr::group_by()%>%
-									distinct()
-# dataset doesn't contain duckworth lewis results. 
-table(blah$year,blah$binary_result)
+```
+##           
+##             0  1
+##   20102011  8 11
+##   20112012 10 18
+##   20122013 17 13
+##   20132014 13 18
+##   20142015 15 17
+##   20152016 19 15
+##   20162017 19 11
+##   20172018 18 20
+##   20182019 33 22
+##   20192020 20 39
 ```
 
 \`\`\`
@@ -234,15 +214,11 @@ What follows is then obvious is the chasing team wins if they are able to lower 
 
 Espncricinfo did article on teams that win games get a higher proportion of their runs in the powerplay and first 10 overs. But proportion of team runs in T20 games doesn't really make sense as a batting metric as we are not just concerned with how many runs they get, but how quickly they get them. So we introduce a new way to measure batsman change in RRR.
 
-```{r}
-# graph of powerplay
-```
+
 
 This graph makes sense as we can see the best openers in the world lower the required run rate so whats the Dhoni Dilemma?
 
-```{r}
-# middle overs (enter in the middle)
-```
+
 
 Dhoni is renowed for being one of the worlds best closers but we can see it seems as though in the middle he is letting the game get out of hand. How can one of the worlds best closers
 
