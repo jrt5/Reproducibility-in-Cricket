@@ -21,9 +21,11 @@ It's simple, left join
 
 ## Scraping New Data
 
-To scrape new data you will need to download docker. This is enable you to load webpages in containers, which allow for button selection and scrolling. This will be necessary as the commentary webpage requires scrolling and clicking of dropdown menus to load all the data for a given game. The various functions have been condensed into just a few easy to use scrapers, which will create the necessary folders for the data. All that is required is you keep an eye on the scraper, since cricinfo is inconsistent in many ways and it may be impossible to scrape certain series using the tools provided.
+To scrape new data you will need to download docker, available free at https://www.docker.com/. This is enable you to load webpages in containers, which allow for button selection and scrolling. This will be necessary as the commentary webpage requires scrolling and clicking of dropdown menus to load all the data for a given game. The various functions have been condensed into just a few easy to use scrapers, which will create the necessary folders for the data. All that is required is you keep an eye on the scraper, since cricinfo is not completely consistent in the way it structures links, it may be impossible to scrape certain series using the tools provided. However the scraping functions have been commented thoroughly in case modifications need to be made.
 
-Docker is available free at https://www.docker.com/
+We have chosen to ignore games that have abnormal, so included are functions to drop the rows in the master spreadsheet that are problematic. In our experience, these are rarely games in T20I, ODI, or in the Big Bash or IPL T20 leagues, which is where our interest in this data lies.
+
+The code for scraping new data for a season is in the run.scraper.R file, and just replace the current season 20192020 with 2020 when it begins
 
 There is the potential of a broken link affecting the scraper, causing it to stop. In this case, we simply leave the commentary and scorecard links on the master as NA values. If these specific links are important to you, it may be necessary to click each tournament within this broken tournament link on the season archive, and manually add the scorecard and commentary links into the master.csv
 
