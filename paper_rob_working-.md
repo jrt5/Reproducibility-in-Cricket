@@ -16,7 +16,7 @@ bibliography: references.bib
 
 ## Abstract
 
-The importance of reproducibility, and the related issue of open access to data, has received a lot of recent attention. Momentum on these issues is gathering in the sports analytics community. While cricket is the second largest commercial sport in the world, unlike other popular international sports, there has been no mechanism for the public to access comprehensive statistics on players and teams. Expert commentary currently relies heavily on data that isn't made readily accessible and this produces an unnecessary barrier for the development of an inclusive sports analytics community.
+The importance of reproducibility, and the related issue of open access to data, has received a lot of recent attention.\^[why this not work] Momentum on these issues is gathering in the sports analytics community. While cricket is the second largest commercial sport in the world, unlike other popular international sports, there has been no mechanism for the public to access comprehensive statistics on players and teams. Expert commentary currently relies heavily on data that isn't made readily accessible and this produces an unnecessary barrier for the development of an inclusive sports analytics community.
 
 ## Introduction
 
@@ -24,9 +24,9 @@ Data access is a key enabler for any analytics community. Most major sports have
 
 By making data more accessible and more advanced metrics more accessible fans data journalism in sports has grown in recent years. For example in [@horowitz2017nflscrapr] has enabled EPA to enter popular discussion among fans.
 
-Cricket is the second largest sport in the world. However, unfortunetaly there is no easy accessible way to access ball by ball data nor aggregated statistics of teams and players. Data while available on sites like [espncricinfo](https://www.espncricinfo.com/) are not in an easy to use form. For example, each match is listed on different webpages so hours upon hours of time would be required to copy and paste a single season. Hence, there are significant logistical barriers for prospective fans and analysts studying the game, which stagnats understanding of cricket.
+Cricket is the second largest sport in the world. However, unfortunetaly there is no easy accessible way to access ball by ball data nor aggregated statistics of teams and players. Data while available on sites like [espncricinfo](https://www.espncricinfo.com/) are not in an easy to use form. For example, each match is listed on different webpages so hours upon hours of time would be required to copy and paste a single season, not to mention the added difficulty of linking players between games and competitions in different countries. Hence, there are significant logistical barriers for prospective fans and analysts studying the game, which stagnats understanding of cricket.
 
-This paper describes the waRne package, the first to provide free and easy access to data for cricket for fans. Web scraping tools are avaiable for fans to easily scrape the play by play commentary data on espncricinfo. For the first time fans can evaluate their favourite teams and players and do so in a reproducible and accessible manner.
+This paper describes the waRne package, the first to provide free and easy access to data for cricket for fans. Web scraping tools are avaiable for fans to easily scrape the play by play commentary data on espncricinfo. For the first time fans can evaluate their favourite teams and players and do so in a reproducible and accessible manner. We hope that this package can be used for fans to better understand the game, for teachers to use for interesting examples in class and for analysts in clubland who might not have access to ball by ball data.
 
 ## Why cricket needs reproducibility
 
@@ -34,23 +34,17 @@ Data accessibility enables fans, analyts and researchers to better understand th
 
 Through being able to reproduce, fans are able to make accessible findings for others and importantly they are able to extend and grow concepts. Unfortuntely what we see through leading cricket analytics providers is a track record of confusing output for fans. This can lead to lower engagement and dismissial of cricket analytics.
 
-For example in this [series of tweets](https://twitter.com/benjonescricket/status/1219898578719723520) we see the narrative being pushed that Steve Smith is a good player vs pace bowling unfortunetly just a few months prior the same company and journalist published an article which had Steve Smith doing much worse against pace (balls above 140km/h). Unlike a similar sport baseball, fans have no easily accisible way of seeing if Steve Smith vs pace is a strength as alluded to in the original tweet, or a weakness like the same persons published online article. In comparsion, fans are able to get a breakdown of Mike Trout vs fastballs from using [baseballr](https://billpetti.github.io/2018-02-19-build-statcast-database-rstats/) which provides access through statcast data from [baseballsavant](%5Bhttps://baseballsavant.mlb.com)](<https://baseballsavant.mlb.com>)) .
+For example in this [series of tweets](https://twitter.com/benjonescricket/status/1219898578719723520) we see the narrative being pushed that Steve Smith is a good player vs pace bowling unfortunetly just a few months prior the same company and journalist published an article which had Steve Smith doing much worse against pace (balls above 140km/h). Unlike a similar sport baseball, fans have no easily accisible way of seeing if Steve Smith vs pace is a strength as alluded to in the original tweet, or a weakness like the same persons published online article. In comparsion, fans are able to get a breakdown of Mike Trout vs fastballs from using [baseballr](https://billpetti.github.io/2018-02-19-build-statcast-database-rstats/) which provides access through statcast data from [baseballsavant](https://baseballsavant.mlb.com/).
 
-Unfortunetly this is just one of many examples whereby a relatively simple statistic is provided by media and fans have no mechanism to fact check. Fact checking is an important avenue for fans to not only engage and understand statistics, but having this mechanism also stops analytics companies from putting out misleading conclusions and findings.
+Unfortunetly this is just one of many examples whereby a relatively simple statistic is provided by media and fans have no mechanism to fact check. Fact checking is an important avenue for fans to not only engage and understand statistics, but having this mechanism also stops analytics people/companies from putting out misleading conclusions and findings.
 
 However though using waRne we are able to not only compare Steve Smiths performance vs bowling type but we are able to easily compare Steve Smiths performance vs bowling types with other players.
 
 ### Steve Smith vs Bowling Type Chart
 
-James here need to figure out the code, do we keep it seperate so in the example we still have to join on bowling type to the ball by ball, or will it just be an extra column joined already.
+Fans of cricket and Australian cricket especially might be interested to see if this is a statistical qwerk of small samples or if Steve Smith generally does perform as an elite cricketer vs pace bowling. Teachers of statistics classes might use this as an interesting example to introduce [tidyverse](https://www.tidyverse.org/learn/) principals [@wickham2019welcome].
 
 
-
-Another reason why is that cricket is a weird sport with a lot of old school rules of thumb that are followed/talked about.
-
-For example it has become popular conjecture that its better that teams should bat second (chase down a total set by the oppoition). Through waRne we can answer such question for the T20 game.
-
-For example we can explore do teams win more often when chasing in the big bash over the history of the big bash, or we can plot a line chart to see if there is a movement towards batting last and winning.
 
 
 
@@ -58,125 +52,13 @@ For example we can explore do teams win more often when chasing in the big bash 
 
 We can also use waRne and other R packages as an easy way to engage students in learning statistical concepts.
 
-For example using the above we can not only look at the answers graphically, but we can run a statistical test. The example we would use is instead of testing is a coin biased (different from 50/50) we can test to see if the winning \\% is different from $0.5$ for teams chasing.
+For example using the above we can not only look at the answers graphically, but we can run a statistical test. A common classroom example for learning the binomial distribution is to ask if a coin is based given a proportion of heads and tails given a sample size [@mcelreath2020statistical]. Instead of asking about coins, fans of sport and cricket might be interested to ask the question; after winning the coin toss, should a team decide to bat first or bat second.
 
+While a coin toss is a seemingly trivial example, like in most professional sports the winner of the coin toss gets to decide what to do. In cricket, the winner of the coin toss gets to decide if they want to bat first and thus set the total that the opposition needs to pass by a single run to win, or if they want to bowl first and thus chase down the total set. Deciding what to do after winning a coin toss has proved to be a popular media piece in recent years \\footnote{[https://www.espncricinfo.com/video/clip/\_/id/23230682](https://www.espncricinfo.com/video/clip/_/id/23230682])} \^[[https://www.espncricinfo.com/story/\_/id/21489056/stuart-wark-cricket-move-away-coin-toss?]](https://www.espncricinfo.com/story/_/id/21489056/stuart-wark-cricket-move-away-coin-toss?%5D) \^[[https://www.espncricinfo.com/story/\_/id/20429499/lehmann-backs-scrapping-toss]](https://www.espncricinfo.com/story/_/id/20429499/lehmann-backs-scrapping-toss%5D) \^[[https://www.espncricinfo.com/story/\_/id/28770755/how-much-does-losing-tosses-impact-visiting-teams]](https://www.espncricinfo.com/story/_/id/28770755/how-much-does-losing-tosses-impact-visiting-teams%5D) \^[<https://www.forbes.com/sites/tristanlavalette/2018/08/20/are-cricket-matches-being-decided-by-the-luck-of-a-coin-toss/#735456837eff>]
 
+\^[<https://www.statsinsider.com.au/bbl/how-important-is-winning-the-toss-in-the-big-bash-league>]
 
-James and I entered a reproducibility competition and the winning entry provided a statistic sort of a gateway into the importance of their ''project'' was was specifically in 2019 Australian Big Bash T20 season. The statistic given was in the 2019 big bash season teams that batted first won only $43$% of games. Thankfully we can try to reproduce that statistic now through the use of waRne
-
-Wikipedia tells us that there were the following:
-
-In the 2018-19 Big Bash League there were 59 matches played. Of which we had 3 DLS results.
-
-| Games                             | Result                        |
-|-----------------------------------|-------------------------------|
-| 21 DEC 2018 - THUNDER VS STARS    | THUNDER WON BY 15 RUNS (D/L)  |
-| 2 FEB 2019 - THUNDER VS SIXERS    | SIXERS WON BY 9 WICKETS (D/L) |
-| 8 JAN 2019 HEAT VS THUNDER        | HEAT BY 15 RUNS (D/L)         |
-| 17th January 2019 Thunder vs Heat | no result                     |
-
-: Games under consideration in 2018-19 Big Bash
-
-
-```
-##           
-##             0  1
-##   20102011  8 11
-##   20112012 10 18
-##   20122013 17 13
-##   20132014 13 18
-##   20142015 15 17
-##   20152016 19 15
-##   20162017 19 11
-##   20172018 18 20
-##   20182019 33 22
-##   20192020 20 39
-```
-
-\`\`\`
-
-So here we can see that we in the big bash season 2018-19 we have a current winning percentage batting first of 22/(22+33) =0.4 but this doesn't include the duckworth lewis games or the washed out completely game.
-
-If we were to add in the duckworth lewis games we get 24/(24+34) which is equal to 0.414. Which isn't the result.
-
-We can also clearly see that in the 20192020 big bash season the team batting first wins 39/(39+20) or 0.66 so what could be going on? Did Quantium mean only games played in the actual year 2019?
-
-In that case from the 2018-2019 season we would remove the following games
-
-| Date                 | Game                    | Result                   | Winning Team |
-|----------------------|-------------------------|--------------------------|--------------|
-| 19 December 2018     | Heat Vs Strickers       | Strickers 5 Wickets      | Chased       |
-| 20th December 2018   | Scorchers Vs Renegades  | Renegades by 4 wickets   | Chased       |
-| 21 December 2018     | Thunder vs Stars        | Thunder by 15 runs (D/L) | Batted First |
-| 22 December 2018     | Sixers vs Scorchers     | Sixers by 17 runs        | Batted First |
-| 22 December          | Hurricanes vs Heat      | Hurricanes by 15 runs    | Batted First |
-| 23 December 2018     | Strikers vs Renegades   | Renegades by 5 wickets   | Chased       |
-| 24 December 2018     | Stars vs Hurricanes     | Hurricanes by 6 wickets  | Chased       |
-| 24th December 2018   | Thunder vs sixers       | Thunder by 21 runs       | Batted First |
-| 26th December 2018   | Strickers vs scorchers  | Scorchers by 7 wickets   | Chased       |
-| 27th December        | Sixers vs Stars         | stars by 5 wickets       | Chased       |
-| 28th December        | thunder vs hurricanes   | hurricanes by 7 wickets  | Chased       |
-| 29th december        | sixers vs renegades     | sixers by 33 runs        | Batted First |
-| 30th decemeber 2018  | scorchers vs hurricanes | hurricanes by 6 wickets  | Chased       |
-| 31st decemember 2018 | strickers vs thunder    | strickers by 20 runs     | Batted First |
-
-: Games in 2018 of the 2018-19 Big Bash Season
-
-i.e. we remove 14 games here of which 6 teams won batting first 16/(22+33-14)
-
-Then from here we have to add on games in the 2019-2020 big bash season that were played in 2019
-
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| Date               | Teams                   | Result                                | Winning Team             |
-+====================+=========================+=======================================+==========================+
-| 17 December        | Thunder vs Heat         | Thunder by 29 runs                    | Batted First             |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| 18th December      | Scorchers vs Sixers     | Sixers by 8 wickets                   | Chased                   |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| 19th december      | Renegades vs thunder    | thunder by 6 wickets                  | chased                   |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| 20th decemeber     | hurricanes vs sixers    | hurricanes by 25 runs                 | batted first             |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| 20th decemember    | stars vs heat           | stars by 22 runs                      | batting first            |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| 21st decemember    | strickers vs thunder    | no result                             | no result                |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| 21st december      | scorchers vs renegades  | scorchers by 11 runs                  | batting first            |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| 22 deceember       | stars vs hurricanes     | stars by 52 runs                      | batting first            |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| 22 decemember      | heat vs sixers          | heat by 48 runs                       | batting first            |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| 23 dec             | strickers vs scorchers  | strickers by 15 (DLS)                 | batting first            |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| 24th dec           | renegades vs hurricanes | hurricanes by 7 wickets               | chased                   |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| 26 decemember      | sixers vs scorchers     | sixers by 48 runs                     | batting first            |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| 27 dec             | strickers vs stars      | strikers by 5 runs                    | batting first            |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| 28th december      | thunder vs sixers       | sixers won super over (batting first) | sixers by superover      |
-|                    |                         |                                       |                          |
-|                    |                         |                                       | or sixers batting second |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| 29th dec           | strikers vs renegades   | strikers by 18 runs                   | batting first            |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| 30th dec           | hurricanes vs stars     | stars by 4 runs (DLS)                 | batting first            |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-| 31st december 2019 | thunder vs strikers     | thunder by 3 runs                     | batting first            |
-+--------------------+-------------------------+---------------------------------------+--------------------------+
-
-: Games played in 2019 of the 2019-20 Big Bash
-
-12 batting first and 3 batting second
-
-(16+12)/(12+3+22+33-14)
-
-So over the past 2 years (not including DLS) we have
-
-(22+39)/(20+39+33+22)
-
-i.e. \>50% of teams win chasing so what does that mean?
+\^[<https://www.espncricinfo.com/story/_/id/18568387/tim-wigmore-how-batting-second-become-more-fruitful-more-popular>]
 
 ## Easier engagement of fans
 
@@ -196,11 +78,15 @@ something something look towards how EPA has changed the way fans are engaged in
 
 -   recreate stats from espncricinfo like this [page](https://www.espncricinfo.com/series/19297/statistics/1187665/new-zealand-vs-england-1st-t20i-england-in-new-zealand-2019-20)
 
++------------------------------+--------------------------------------------------------------------------+
 | Things to do                 | person                                                                   |
-|------------------------------|--------------------------------------------------------------------------|
++==============================+==========================================================================+
 | clean scrapers/csv for waRne | James                                                                    |
++------------------------------+--------------------------------------------------------------------------+
 | data dictionary              | Robert                                                                   |
++------------------------------+--------------------------------------------------------------------------+
 | examples                     | Robert - start (assume same csv being used) - cool cricket example stuff |
++------------------------------+--------------------------------------------------------------------------+
 
 ## Dhoni Dilemma
 

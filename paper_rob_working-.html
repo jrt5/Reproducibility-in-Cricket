@@ -1528,307 +1528,34 @@ div.tocify {
 
 <div id="abstract" class="section level2">
 <h2>Abstract</h2>
-<p>The importance of reproducibility, and the related issue of open access to data, has received a lot of recent attention. Momentum on these issues is gathering in the sports analytics community. While cricket is the second largest commercial sport in the world, unlike other popular international sports, there has been no mechanism for the public to access comprehensive statistics on players and teams. Expert commentary currently relies heavily on data that isn’t made readily accessible and this produces an unnecessary barrier for the development of an inclusive sports analytics community.</p>
+<p>The importance of reproducibility, and the related issue of open access to data, has received a lot of recent attention.^[why this not work] Momentum on these issues is gathering in the sports analytics community. While cricket is the second largest commercial sport in the world, unlike other popular international sports, there has been no mechanism for the public to access comprehensive statistics on players and teams. Expert commentary currently relies heavily on data that isn’t made readily accessible and this produces an unnecessary barrier for the development of an inclusive sports analytics community.</p>
 </div>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>Data access is a key enabler for any analytics community. Most major sports have easy access to match statistics, for example <a href="https://github.com/abresler/nbastatR">nbastatR</a> for NBA, <a href="https://cran.r-project.org/web/packages/Lahman/Lahman.pdf">Lahman</a> for baseball, <a href="https://github.com/skoval/deuce">deuce</a> for tennis and <a href="https://github.com/mrcaseb/nflfastR">nflfastR</a> for NFL. Through access to sports data and reproducible findings and metrics fans clubs and researchers are better able to understand the game, predict match outcomes and rate players. For example the way teams tackled 4th down decisions in the NFL has changed since <span class="citation">(Romer 2006)</span> seminial work. As teams have changed their 4th down decision making this allows follow up research such as <span class="citation">(Yam and Lopez 2019)</span> which looked at more granular data to see if this happens in practice.</p>
 <p>By making data more accessible and more advanced metrics more accessible fans data journalism in sports has grown in recent years. For example in <span class="citation">(Horowitz, Yurko, and Ventura 2017)</span> has enabled EPA to enter popular discussion among fans.</p>
-<p>Cricket is the second largest sport in the world. However, unfortunetaly there is no easy accessible way to access ball by ball data nor aggregated statistics of teams and players. Data while available on sites like <a href="https://www.espncricinfo.com/">espncricinfo</a> are not in an easy to use form. For example, each match is listed on different webpages so hours upon hours of time would be required to copy and paste a single season. Hence, there are significant logistical barriers for prospective fans and analysts studying the game, which stagnats understanding of cricket.</p>
-<p>This paper describes the waRne package, the first to provide free and easy access to data for cricket for fans. Web scraping tools are avaiable for fans to easily scrape the play by play commentary data on espncricinfo. For the first time fans can evaluate their favourite teams and players and do so in a reproducible and accessible manner.</p>
+<p>Cricket is the second largest sport in the world. However, unfortunetaly there is no easy accessible way to access ball by ball data nor aggregated statistics of teams and players. Data while available on sites like <a href="https://www.espncricinfo.com/">espncricinfo</a> are not in an easy to use form. For example, each match is listed on different webpages so hours upon hours of time would be required to copy and paste a single season, not to mention the added difficulty of linking players between games and competitions in different countries. Hence, there are significant logistical barriers for prospective fans and analysts studying the game, which stagnats understanding of cricket.</p>
+<p>This paper describes the waRne package, the first to provide free and easy access to data for cricket for fans. Web scraping tools are avaiable for fans to easily scrape the play by play commentary data on espncricinfo. For the first time fans can evaluate their favourite teams and players and do so in a reproducible and accessible manner. We hope that this package can be used for fans to better understand the game, for teachers to use for interesting examples in class and for analysts in clubland who might not have access to ball by ball data.</p>
 </div>
 <div id="why-cricket-needs-reproducibility" class="section level2">
 <h2>Why cricket needs reproducibility</h2>
 <p>Data accessibility enables fans, analyts and researchers to better understand the game. Through being able to reproduce common popular metrics, visualisations and article findings.</p>
 <p>Through being able to reproduce, fans are able to make accessible findings for others and importantly they are able to extend and grow concepts. Unfortuntely what we see through leading cricket analytics providers is a track record of confusing output for fans. This can lead to lower engagement and dismissial of cricket analytics.</p>
-<p>For example in this <a href="https://twitter.com/benjonescricket/status/1219898578719723520">series of tweets</a> we see the narrative being pushed that Steve Smith is a good player vs pace bowling unfortunetly just a few months prior the same company and journalist published an article which had Steve Smith doing much worse against pace (balls above 140km/h). Unlike a similar sport baseball, fans have no easily accisible way of seeing if Steve Smith vs pace is a strength as alluded to in the original tweet, or a weakness like the same persons published online article. In comparsion, fans are able to get a breakdown of Mike Trout vs fastballs from using <a href="https://billpetti.github.io/2018-02-19-build-statcast-database-rstats/">baseballr</a> which provides access through statcast data from <a href="%5Bhttps://baseballsavant.mlb.com">baseballsavant</a>](<a href="https://baseballsavant.mlb.com" class="uri">https://baseballsavant.mlb.com</a>)) .</p>
-<p>Unfortunetly this is just one of many examples whereby a relatively simple statistic is provided by media and fans have no mechanism to fact check. Fact checking is an important avenue for fans to not only engage and understand statistics, but having this mechanism also stops analytics companies from putting out misleading conclusions and findings.</p>
+<p>For example in this <a href="https://twitter.com/benjonescricket/status/1219898578719723520">series of tweets</a> we see the narrative being pushed that Steve Smith is a good player vs pace bowling unfortunetly just a few months prior the same company and journalist published an article which had Steve Smith doing much worse against pace (balls above 140km/h). Unlike a similar sport baseball, fans have no easily accisible way of seeing if Steve Smith vs pace is a strength as alluded to in the original tweet, or a weakness like the same persons published online article. In comparsion, fans are able to get a breakdown of Mike Trout vs fastballs from using <a href="https://billpetti.github.io/2018-02-19-build-statcast-database-rstats/">baseballr</a> which provides access through statcast data from <a href="https://baseballsavant.mlb.com/">baseballsavant</a>.</p>
+<p>Unfortunetly this is just one of many examples whereby a relatively simple statistic is provided by media and fans have no mechanism to fact check. Fact checking is an important avenue for fans to not only engage and understand statistics, but having this mechanism also stops analytics people/companies from putting out misleading conclusions and findings.</p>
 <p>However though using waRne we are able to not only compare Steve Smiths performance vs bowling type but we are able to easily compare Steve Smiths performance vs bowling types with other players.</p>
 <div id="steve-smith-vs-bowling-type-chart" class="section level3">
 <h3>Steve Smith vs Bowling Type Chart</h3>
-<p>James here need to figure out the code, do we keep it seperate so in the example we still have to join on bowling type to the ball by ball, or will it just be an extra column joined already.</p>
-<p>Another reason why is that cricket is a weird sport with a lot of old school rules of thumb that are followed/talked about.</p>
-<p>For example it has become popular conjecture that its better that teams should bat second (chase down a total set by the oppoition). Through waRne we can answer such question for the T20 game.</p>
-<p>For example we can explore do teams win more often when chasing in the big bash over the history of the big bash, or we can plot a line chart to see if there is a movement towards batting last and winning.</p>
+<p>Fans of cricket and Australian cricket especially might be interested to see if this is a statistical qwerk of small samples or if Steve Smith generally does perform as an elite cricketer vs pace bowling. Teachers of statistics classes might use this as an interesting example to introduce <a href="https://www.tidyverse.org/learn/">tidyverse</a> principals <span class="citation">(Wickham et al. 2019)</span>.</p>
 </div>
 </div>
 <div id="using-warne-to-teach-undergraduate-statistics" class="section level2">
 <h2>Using waRne to teach undergraduate statistics</h2>
 <p>We can also use waRne and other R packages as an easy way to engage students in learning statistical concepts.</p>
-<p>For example using the above we can not only look at the answers graphically, but we can run a statistical test. The example we would use is instead of testing is a coin biased (different from 50/50) we can test to see if the winning \% is different from <span class="math inline">\(0.5\)</span> for teams chasing.</p>
-<p>James and I entered a reproducibility competition and the winning entry provided a statistic sort of a gateway into the importance of their ‘’project’’ was was specifically in 2019 Australian Big Bash T20 season. The statistic given was in the 2019 big bash season teams that batted first won only <span class="math inline">\(43\)</span>% of games. Thankfully we can try to reproduce that statistic now through the use of waRne</p>
-<p>Wikipedia tells us that there were the following:</p>
-<p>In the 2018-19 Big Bash League there were 59 matches played. Of which we had 3 DLS results.</p>
-<table>
-<caption>Games under consideration in 2018-19 Big Bash</caption>
-<thead>
-<tr class="header">
-<th>Games</th>
-<th>Result</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>21 DEC 2018 - THUNDER VS STARS</td>
-<td>THUNDER WON BY 15 RUNS (D/L)</td>
-</tr>
-<tr class="even">
-<td>2 FEB 2019 - THUNDER VS SIXERS</td>
-<td>SIXERS WON BY 9 WICKETS (D/L)</td>
-</tr>
-<tr class="odd">
-<td>8 JAN 2019 HEAT VS THUNDER</td>
-<td>HEAT BY 15 RUNS (D/L)</td>
-</tr>
-<tr class="even">
-<td>17th January 2019 Thunder vs Heat</td>
-<td>no result</td>
-</tr>
-</tbody>
-</table>
-<pre><code>##           
-##             0  1
-##   20102011  8 11
-##   20112012 10 18
-##   20122013 17 13
-##   20132014 13 18
-##   20142015 15 17
-##   20152016 19 15
-##   20162017 19 11
-##   20172018 18 20
-##   20182019 33 22
-##   20192020 20 39</code></pre>
-<p>```</p>
-<p>So here we can see that we in the big bash season 2018-19 we have a current winning percentage batting first of 22/(22+33) =0.4 but this doesn’t include the duckworth lewis games or the washed out completely game.</p>
-<p>If we were to add in the duckworth lewis games we get 24/(24+34) which is equal to 0.414. Which isn’t the result.</p>
-<p>We can also clearly see that in the 20192020 big bash season the team batting first wins 39/(39+20) or 0.66 so what could be going on? Did Quantium mean only games played in the actual year 2019?</p>
-<p>In that case from the 2018-2019 season we would remove the following games</p>
-<table>
-<caption>Games in 2018 of the 2018-19 Big Bash Season</caption>
-<thead>
-<tr class="header">
-<th>Date</th>
-<th>Game</th>
-<th>Result</th>
-<th>Winning Team</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>19 December 2018</td>
-<td>Heat Vs Strickers</td>
-<td>Strickers 5 Wickets</td>
-<td>Chased</td>
-</tr>
-<tr class="even">
-<td>20th December 2018</td>
-<td>Scorchers Vs Renegades</td>
-<td>Renegades by 4 wickets</td>
-<td>Chased</td>
-</tr>
-<tr class="odd">
-<td>21 December 2018</td>
-<td>Thunder vs Stars</td>
-<td>Thunder by 15 runs (D/L)</td>
-<td>Batted First</td>
-</tr>
-<tr class="even">
-<td>22 December 2018</td>
-<td>Sixers vs Scorchers</td>
-<td>Sixers by 17 runs</td>
-<td>Batted First</td>
-</tr>
-<tr class="odd">
-<td>22 December</td>
-<td>Hurricanes vs Heat</td>
-<td>Hurricanes by 15 runs</td>
-<td>Batted First</td>
-</tr>
-<tr class="even">
-<td>23 December 2018</td>
-<td>Strikers vs Renegades</td>
-<td>Renegades by 5 wickets</td>
-<td>Chased</td>
-</tr>
-<tr class="odd">
-<td>24 December 2018</td>
-<td>Stars vs Hurricanes</td>
-<td>Hurricanes by 6 wickets</td>
-<td>Chased</td>
-</tr>
-<tr class="even">
-<td>24th December 2018</td>
-<td>Thunder vs sixers</td>
-<td>Thunder by 21 runs</td>
-<td>Batted First</td>
-</tr>
-<tr class="odd">
-<td>26th December 2018</td>
-<td>Strickers vs scorchers</td>
-<td>Scorchers by 7 wickets</td>
-<td>Chased</td>
-</tr>
-<tr class="even">
-<td>27th December</td>
-<td>Sixers vs Stars</td>
-<td>stars by 5 wickets</td>
-<td>Chased</td>
-</tr>
-<tr class="odd">
-<td>28th December</td>
-<td>thunder vs hurricanes</td>
-<td>hurricanes by 7 wickets</td>
-<td>Chased</td>
-</tr>
-<tr class="even">
-<td>29th december</td>
-<td>sixers vs renegades</td>
-<td>sixers by 33 runs</td>
-<td>Batted First</td>
-</tr>
-<tr class="odd">
-<td>30th decemeber 2018</td>
-<td>scorchers vs hurricanes</td>
-<td>hurricanes by 6 wickets</td>
-<td>Chased</td>
-</tr>
-<tr class="even">
-<td>31st decemember 2018</td>
-<td>strickers vs thunder</td>
-<td>strickers by 20 runs</td>
-<td>Batted First</td>
-</tr>
-</tbody>
-</table>
-<p>i.e. we remove 14 games here of which 6 teams won batting first 16/(22+33-14)</p>
-<p>Then from here we have to add on games in the 2019-2020 big bash season that were played in 2019</p>
-<table style="width:100%;">
-<caption>Games played in 2019 of the 2019-20 Big Bash</caption>
-<colgroup>
-<col width="18%"></col>
-<col width="22%"></col>
-<col width="35%"></col>
-<col width="23%"></col>
-</colgroup>
-<thead>
-<tr class="header">
-<th>Date</th>
-<th>Teams</th>
-<th>Result</th>
-<th>Winning Team</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>17 December</td>
-<td>Thunder vs Heat</td>
-<td>Thunder by 29 runs</td>
-<td>Batted First</td>
-</tr>
-<tr class="even">
-<td>18th December</td>
-<td>Scorchers vs Sixers</td>
-<td>Sixers by 8 wickets</td>
-<td>Chased</td>
-</tr>
-<tr class="odd">
-<td>19th december</td>
-<td>Renegades vs thunder</td>
-<td>thunder by 6 wickets</td>
-<td>chased</td>
-</tr>
-<tr class="even">
-<td>20th decemeber</td>
-<td>hurricanes vs sixers</td>
-<td>hurricanes by 25 runs</td>
-<td>batted first</td>
-</tr>
-<tr class="odd">
-<td>20th decemember</td>
-<td>stars vs heat</td>
-<td>stars by 22 runs</td>
-<td>batting first</td>
-</tr>
-<tr class="even">
-<td>21st decemember</td>
-<td>strickers vs thunder</td>
-<td>no result</td>
-<td>no result</td>
-</tr>
-<tr class="odd">
-<td>21st december</td>
-<td>scorchers vs renegades</td>
-<td>scorchers by 11 runs</td>
-<td>batting first</td>
-</tr>
-<tr class="even">
-<td>22 deceember</td>
-<td>stars vs hurricanes</td>
-<td>stars by 52 runs</td>
-<td>batting first</td>
-</tr>
-<tr class="odd">
-<td>22 decemember</td>
-<td>heat vs sixers</td>
-<td>heat by 48 runs</td>
-<td>batting first</td>
-</tr>
-<tr class="even">
-<td>23 dec</td>
-<td>strickers vs scorchers</td>
-<td>strickers by 15 (DLS)</td>
-<td>batting first</td>
-</tr>
-<tr class="odd">
-<td>24th dec</td>
-<td>renegades vs hurricanes</td>
-<td>hurricanes by 7 wickets</td>
-<td>chased</td>
-</tr>
-<tr class="even">
-<td>26 decemember</td>
-<td>sixers vs scorchers</td>
-<td>sixers by 48 runs</td>
-<td>batting first</td>
-</tr>
-<tr class="odd">
-<td>27 dec</td>
-<td>strickers vs stars</td>
-<td>strikers by 5 runs</td>
-<td>batting first</td>
-</tr>
-<tr class="even">
-<td>28th december</td>
-<td>thunder vs sixers</td>
-<td>sixers won super over (batting first)</td>
-<td><p>sixers by superover</p>
-<p>or sixers batting second</p></td>
-</tr>
-<tr class="odd">
-<td>29th dec</td>
-<td>strikers vs renegades</td>
-<td>strikers by 18 runs</td>
-<td>batting first</td>
-</tr>
-<tr class="even">
-<td>30th dec</td>
-<td>hurricanes vs stars</td>
-<td>stars by 4 runs (DLS)</td>
-<td>batting first</td>
-</tr>
-<tr class="odd">
-<td>31st december 2019</td>
-<td>thunder vs strikers</td>
-<td>thunder by 3 runs</td>
-<td>batting first</td>
-</tr>
-</tbody>
-</table>
-<p>12 batting first and 3 batting second</p>
-<p>(16+12)/(12+3+22+33-14)</p>
-<p>So over the past 2 years (not including DLS) we have</p>
-<p>(22+39)/(20+39+33+22)</p>
-<p>i.e. &gt;50% of teams win chasing so what does that mean?</p>
+<p>For example using the above we can not only look at the answers graphically, but we can run a statistical test. A common classroom example for learning the binomial distribution is to ask if a coin is based given a proportion of heads and tails given a sample size <span class="citation">(McElreath 2020)</span>. Instead of asking about coins, fans of sport and cricket might be interested to ask the question; after winning the coin toss, should a team decide to bat first or bat second.</p>
+<p>While a coin toss is a seemingly trivial example, like in most professional sports the winner of the coin toss gets to decide what to do. In cricket, the winner of the coin toss gets to decide if they want to bat first and thus set the total that the opposition needs to pass by a single run to win, or if they want to bowl first and thus chase down the total set. Deciding what to do after winning a coin toss has proved to be a popular media piece in recent years \footnote{<a href="https://www.espncricinfo.com/video/clip/_/id/23230682%5D">https://www.espncricinfo.com/video/clip/_/id/23230682</a>} ^<a href="https://www.espncricinfo.com/story/_/id/21489056/stuart-wark-cricket-move-away-coin-toss?%5D">[https://www.espncricinfo.com/story/_/id/21489056/stuart-wark-cricket-move-away-coin-toss?]</a> ^<a href="https://www.espncricinfo.com/story/_/id/20429499/lehmann-backs-scrapping-toss%5D">[https://www.espncricinfo.com/story/_/id/20429499/lehmann-backs-scrapping-toss]</a> ^<a href="https://www.espncricinfo.com/story/_/id/28770755/how-much-does-losing-tosses-impact-visiting-teams%5D">[https://www.espncricinfo.com/story/_/id/28770755/how-much-does-losing-tosses-impact-visiting-teams]</a> ^[<a href="https://www.forbes.com/sites/tristanlavalette/2018/08/20/are-cricket-matches-being-decided-by-the-luck-of-a-coin-toss/#735456837eff" class="uri">https://www.forbes.com/sites/tristanlavalette/2018/08/20/are-cricket-matches-being-decided-by-the-luck-of-a-coin-toss/#735456837eff</a>]</p>
+<p>^[<a href="https://www.statsinsider.com.au/bbl/how-important-is-winning-the-toss-in-the-big-bash-league" class="uri">https://www.statsinsider.com.au/bbl/how-important-is-winning-the-toss-in-the-big-bash-league</a>]</p>
+<p>^[<a href="https://www.espncricinfo.com/story/_/id/18568387/tim-wigmore-how-batting-second-become-more-fruitful-more-popular" class="uri">https://www.espncricinfo.com/story/_/id/18568387/tim-wigmore-how-batting-second-become-more-fruitful-more-popular</a>]</p>
 </div>
 <div id="easier-engagement-of-fans" class="section level2">
 <h2>Easier engagement of fans</h2>
@@ -1848,8 +1575,8 @@ div.tocify {
 </ul>
 <table>
 <colgroup>
-<col width="28%"></col>
-<col width="71%"></col>
+<col width="29%"></col>
+<col width="70%"></col>
 </colgroup>
 <thead>
 <tr class="header">
@@ -1896,8 +1623,14 @@ div.tocify {
 <div id="ref-horowitz2017nflscrapr">
 <p>Horowitz, Maksim, Ron Yurko, and Samuel L Ventura. 2017. “NflscrapR: Compiling the Nfl Play-by-Play Api for Easy Use in R.” <em>URL Https://Github. Com/Maksimhorowitz/nflscrapR, R Package Version</em> 1 (0).</p>
 </div>
+<div id="ref-mcelreath2020statistical">
+<p>McElreath, Richard. 2020. <em>Statistical Rethinking: A Bayesian Course with Examples in R and Stan</em>. CRC press.</p>
+</div>
 <div id="ref-romer2006firms">
 <p>Romer, David. 2006. “Do Firms Maximize? Evidence from Professional Football.” <em>Journal of Political Economy</em> 114 (2): 340–65.</p>
+</div>
+<div id="ref-wickham2019welcome">
+<p>Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. “Welcome to the Tidyverse.” <em>Journal of Open Source Software</em> 4 (43): 1686.</p>
 </div>
 <div id="ref-yam2019lost">
 <p>Yam, Derrick R, and Michael J Lopez. 2019. “What Was Lost? A Causal Estimate of Fourth down Behavior in the National Football League.” <em>Journal of Sports Analytics</em> 5 (3): 153–67.</p>
