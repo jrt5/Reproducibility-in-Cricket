@@ -1088,7 +1088,7 @@ remove_master_row <- function(year_input, root_path, row_to_drop){
 
 # So just use the same root as before, to the folder that will contain all the code, and data, and
 # whatever else you may eventially put in here in your cricket analysis
-collect_commentary_html_new_new_format <- function(year_input, root_path){
+collect_commentary_html <- function(year_input, root_path){
 	# system('docker kill $(docker ps -q)')
 	# Set up the appropriate paths first
 	

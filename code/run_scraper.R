@@ -5,7 +5,7 @@ library(rvest)
 library(htmltools)
 library(lubridate)
 library(magrittr)
-source("/Users/robertnguyen/Library/Mobile Documents/com~apple~CloudDocs/OneDrive/Reproducibility-in-Cricket/code/scraping_functions.R")
+source("/Users/James/James/Reproducibility-in-Cricket/code/scraping_functions.R")
 
 # You will need to create an image to do this in docker
 # system('docker run -d -p 4445:4444 --shm-size 2g selenium/standalone-chrome')
@@ -17,7 +17,7 @@ system('docker run -d -p 4445:4444 --shm-size 2g selenium/standalone-chrome')
 # remove it for you. The links are printed for each 
 complete = 0
 while(complete!=1){
-	commentary <- try(grab_tournament_links(2018, "/Users/robertnguyen/Library/Mobile Documents/com~apple~CloudDocs/OneDrive/Reproducibility-in-Cricket"))
+	commentary <- try(grab_tournament_links(20192020, "/Users/James/James/Reproducibility-in-Cricket"))
 	if(class(commentary)=="try-error"){
 		error_type <- attr(commentary, "condition")
 		print(class(error_type))
