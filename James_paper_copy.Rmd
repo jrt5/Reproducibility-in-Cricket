@@ -2,12 +2,12 @@
 title: "waRne - Putting cricket analytics in a spin"
 bibliography: references.bib
 output:
-  pdf_document:
-    toc: yes
   html_document:
     keep_md: yes
     toc: yes
     toc_float: yes
+  pdf_document:
+    toc: yes
 authors: Robert(1), James (2)
 ---
 
@@ -54,7 +54,7 @@ bowler_vars <-
   player_database %>% 
   dplyr::select(-c(batting_style, player_name)) %>% 
   drop_na()%>% 
-  mutate(bowling_style = recode(bowling_style, "Right-arm fast" = "Pace",
+  mutate(pace_spin = bowling_style, "Right-arm fast" = "Pace",
                                 "Slow left-arm orthodox"= "Spin",
                                 "Legbreak"= "Spin",
                                 "Right-arm medium"= "Pace",
@@ -71,7 +71,7 @@ bowler_vars <-
                                 "Right-arm medium, Right-arm offbreak"= "Spin",
                                 "Left-arm medium, Slow left-arm orthodox, 
                                                Slow left-arm chinaman"= "Spin", 
-                                "Left-arm medium, Slow left-arm orthodox, Slow left-arm chinaman" = "Spin"))
+                                "Left-arm medium, Slow left-arm orthodox, Slow left-arm chinaman" = "Spin")
 
 batting_vars <- 
   player_database %>% 
@@ -298,7 +298,7 @@ wins = dat$win_count[2]
 
 z = (wins/N-0.5)/sqrt((0.5^2)/N)
 
-1-pnorm(abs(z))
+2*(pnorm(z))
 
 # No eveidence to suggest the 2 inning team wins more
 
@@ -448,27 +448,1099 @@ something something look towards how EPA has changed the way fans are engaged in
 
 ## Dhoni Dilemma
 
-With this new dataset, we allow fans to put on their analyst thats and to be able to ask themselves, what exactly makes a good closer and what exactly is the Dhoni Dilemma.
+With this new dataset, we allow fans to put on their analyst thats and to be able to ask themselves, what exactly makes a good closer and what exactly is the Dhoni Dilemma. To understand the Dhoni Deilemma, we need to see some interesting things to do with the change in RRR.
 
-To understand the Dhoni Deilemma, we need to see some interesting things to do with the change in RRR.
+Cricket is an obvious sort of sport, to win in the end you have to get one run more than your opposition. A commonly used statistic during the broadcast is the required run rate, for example if you need 120 to win off 20 overs your RRR is \$6\$ runs an over. What follows is then obvious is the chasing team wins if they are able to lower the RRR that is score quicker.
 
-Cricket is an obvious sort of sport, to win in the end you have to get one run more than your opposition. A commonly used statistic during the broadcast is the required run rate, for example if you need 120 to win off 20 overs your RRR is \$6\$ runs an over
-
-What follows is then obvious is the chasing team wins if they are able to lower the RRR that is score quicker.
-
-Espncricinfo did article on teams that win games get a higher proportion of their runs in the powerplay and first 10 overs. But proportion of team runs in T20 games doesn't really make sense as a batting metric as we are not just concerned with how many runs they get, but how quickly they get them. So we introduce a new way to measure batsman change in RRR.
+Espncricinfo did article on teams that win games get a higher proportion of their runs in the powerplay and first 10 overs. But proportion of team runs in T20 games doesn't really make sense as a batting metric as we are not just concerned with how many runs they get, but how quickly they get them. So we introduce a new way to measure batsman change in RRR. 
 
 ```{r}
 # graph of powerplay
+
+opening_batsman_of_interest <- c(
+  # 230559, #pollard
+  48472, #t dilshaan
+  37737, #brendon mccalum
+  8180, #shane watson
+  47270, #greme smith, 
+  28763, #gautham gambhir
+  226492, #martn guptil
+  49289, #mahela jayawardene
+  56194, #tamim iqbal
+  55608, #hamilton masakadza
+  51880, #gayle
+  41434, #mohommad hafeez
+  259410, #ahmed shehzad
+  24611, #william porterfield
+  # 49209, #sanath jayasuriya
+  43906, #hashim amla
+  16406, #michael lumb
+  # 42683, #salman butt
+  # 325012, #stoinis
+  # 272450, #MR Marsh
+  # 28081, #Dhoni
+  # 253802, #kholi
+  5334, #finch
+  219889, #warner
+  # 326434, #carey
+  267192, #smith
+  # 505120, #agar
+  # 530011, #head
+  # 5961, #henriques
+  # 325026, #maxwell
+  # 25913, #nabu
+  # 4864, #christian,
+  # 270484, #faulkner
+  # 230193, #wade
+  # 233680, #wells
+  # 500268, #turner
+  # 334337, #handscomb
+  # 603410, #mcdermott
+  # 308798  #short
+  # 787987, #labuschagne
+  # 1124282, # josh phillipe
+  # 326637, #Chris Lyrnn
+  # 5939, #hussey
+  # 931581 #pant
+  308967, # jos buttler
+  253802, #Kohli
+  249866  # alex hales
+)
+
+# Dot plot for openers
+cricjam_data_big %>% 
+  dplyr::filter(inning == 2, 
+                batsman_id %in% opening_batsman_of_interest, 
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                over<6) %>% 
+  group_by(batsman_name) %>% 
+  summarise(change = mean(change_in_requireed_run_rate), 
+            total_balls_faced = n()) %>% 
+  ggplot(aes(x = total_balls_faced, y = change, label = batsman_name)) +
+  geom_point(size = 2) +
+  xlim(c(50, 1250))+
+  geom_text(vjust = 1.4, color = "black") +
+  theme_minimal()+
+  labs(x = "Balls Faced", 
+       y = "Average Change in Required Run Rate", 
+       title = "Top Opening Batsmen T20")
+  theme(axis.text = element_text(size = 12), 
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size = 16))
+
 ```
 
-This graph makes sense as we can see the best openers in the world lower the required run rate so whats the Dhoni Dilemma?
+This graph makes sense as we can see some of the best openers in the world lower the required run rate. So what is the Dhoni Dilemma? 
+
+Dhoni is considered the greatest closing batsman in the world. He has pulled of many spectacular saves, and has T20 and T20I strike rates after 14 years in the game. But how does his required run rate compare to other middle order and closing batsman
 
 ```{r}
 # middle overs (enter in the middle)
+
+middle_batsman_of_interest <- c(
+  230559, #pollard
+  32498, #yusef pathan
+  321777, #david miller
+  44936, #AB De Villiers
+  276298, #andre russell
+  8180, #shane watson
+  34102, #rohit sharma
+  # 51880, #gayle
+  # 325012, #stoinis
+  # 272450, #MR Marsh
+  28081, #Dhoni
+  # 253802, #kholi
+  # 5334, #finch
+  # 219889, #warner
+  # 326434, #carey
+  # 267192, #smith
+  # 505120, #agar
+  # 530011, #head
+  # 5961, #henriques
+  325026 #maxwell
+  # 25913, #nabu
+  # 4864, #christian,
+  # 270484, #faulkner
+  # 230193, #wade
+  # 233680, #wells
+  # 500268, #turner
+  # 334337, #handscomb
+  # 603410, #mcdermott
+  # 308798  #short
+  # 787987, #labuschagne
+  # 1124282, # josh phillipe
+  # 326637, #Chris Lyrnn
+  # 5939, #hussey
+  # 931581 #pant
+  # 308967, # job buttler
+  # 249866  # alex hales
+)  
+
+cricjam_data_big %>% 
+  dplyr::filter(inning == 2, 
+                batsman_id %in% middle_batsman_of_interest, 
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                # min(batsman_balls_faced_this_match)==1,
+                over<16, 
+                over>=6) %>% 
+  group_by(batsman_id, match_id) %>% 
+  mutate(min_balls = if_else(min(batsman_balls_faced_this_match)==1, 1, 0)) %>% 
+  ungroup() %>% 
+  # dplyr::filter(min_balls==1) %>%
+  group_by(batsman_name) %>% 
+	# dplyr::filter(batsman_id == 28081) %>% ggplot(aes(x = change_in_requireed_run_rate))+geom_histogram()
+  summarise(change = mean(change_in_requireed_run_rate), 
+            total_balls_faced = n()) %>% 
+  ggplot(aes(x = total_balls_faced, y = change, label = batsman_name)) +
+  geom_point() +
+	xlim(c(300, 1300))+
+  # geom_text(vjust = 1, color = "black") +
+  labs(x = "Balls Faced", 
+       y = "Average Change in Required Run Rate", 
+       title = "Top Middle Batsmen T20")+
+  geom_text(vjust = 1.4, color = "black") +
+  theme_minimal() 
+  theme(axis.text = element_text(size = 12), 
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size = 16)) 
+  
+
 ```
 
-Dhoni is renowed for being one of the worlds best closers but we can see it seems as though in the middle he is letting the game get out of hand. How can one of the worlds best closers
+Dhoni is renowed for being one of the worlds best closers but we can see it seems as though in the middle he is letting the game get out of hand. How can one of the worlds best closers let the run rate go up so consistently in the middle overs? 
+
+One possible explanation comes from looking at the acceleration of Dhoni compared to these other middle order batsmen. Dhoni comes in usually around overs 11/12, and from the plot below we can see that he is a slow starter, it takes several overs for him to get his strike rate up, which consistently stays high throughout the game even when other batsmen's begins to drop off.
+
+```{r}
+
+cricjam_data_big %>%
+	dplyr::filter(batsman_id == 28081, 
+								batsman_balls_faced_this_match == 1) %>%
+	group_by(bucketed_over) %>% 
+	summarise(total = n()) %>% 
+	ungroup() %>% 
+	mutate(mean(total))
+	
+
+cricjam_data_big %>% 
+    dplyr::filter(batsman_id %in% middle_batsman_of_interest, 
+                  !is.infinite(required_run_rate), 
+                  over>=6, 
+    							# over <16
+                  # batsman_id == 5961
+                  # batsman_balls_faced_this_match == 1
+                  ) %>% 
+    # dplyr::select(over, earned_runs, play_description) %>%
+    # group_by(earned_runs) %>% 
+    # summarise(n())
+    # group_by(batsman_id, match_id) %>% 
+    # mutate(min_balls = if_else(min(batsman_balls_faced_this_match)==1, 1, 0)) %>% 
+    # ungroup() %>%
+    group_by(batsman_balls_faced_this_match, batsman_name) %>%  # from here to the next comment is for sr, the rest is for 
+    summarise(sr = 100*sum(extra_runs+earned_runs)/n(), 
+              count = n()) %>% 
+    # dplyr::filter(batsman_balls_faced_this_match<50) %>% 
+    ggplot(aes(x = batsman_balls_faced_this_match, y = sr)) + 
+    geom_smooth() +
+    geom_hline(yintercept = 120) +
+    ylim(c(0,200))+
+    labs(x = "Balls Faced", 
+         y = "Strike Rate", 
+         title = "Batsman Acceleration In Overs 11-20")+
+    theme_minimal() +
+    theme(axis.text = element_text(size = 12), 
+          axis.title = element_text(size = 16),
+          plot.title = element_text(size = 16)) +
+    # ylim(c(50, 200))+
+    facet_wrap(~batsman_name)
+
+```
+
+Another is the effort of Dhoni's partners in moving the game along while Dhoni is up
+
+```{r}
+
+middle_batsman_of_interest <- c(
+  230559, #pollard
+  32498, #yusef pathan
+  321777, #david miller
+  44936, #AB De Villiers
+  276298, #andre russell
+  8180, #shane watson
+  34102, #rohit sharma
+  28081, #Dhoni
+  325026 #maxwell
+  )  
+maxwell <-
+  cricjam_data_big %>% 
+  dplyr::filter(batsman_id %in% 325026, 
+                inning == 2, resources>10,
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                over < 16,
+                over >= 6 
+                # batsman_balls_faced_this_match==1, 
+                # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+  ) %>% 
+  distinct(match_id, bucketed_over) %>% 
+  left_join(cricjam_data_big %>% 
+              dplyr::filter(inning == 2, 
+                            !is.infinite(required_run_rate), 
+                            over < 16,
+              							resources>10,
+                            over >= 6), by = c("match_id" = "match_id", 
+                                               "bucketed_over" = "bucketed_over")) %>% 
+  group_by(bucketed_over, match_id) %>% 
+  mutate(starting_rrr = first(required_run_rate), 
+         ending_rrr = last(required_run_rate), 
+         diff = ending_rrr-starting_rrr) %>% 
+  group_by(bucketed_over) %>% 
+  summarise(avg_Maxwell = mean(diff))  %>% 
+	mutate(batsman_partner_Maxwell = "Partnership") %>% 
+	bind_rows(cricjam_data_big %>% 
+							dplyr::filter(batsman_id %in% 325026, 
+                inning == 2, 
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                over < 16,resources>10,
+                over >= 6 
+                # batsman_balls_faced_this_match==1, 
+                # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+  ) %>% 
+  distinct(match_id, bucketed_over) %>% 
+  left_join(cricjam_data_big %>% 
+              dplyr::filter(inning == 2, 
+                            !is.infinite(required_run_rate), 
+                            over < 16,
+              							resources>10,
+                            over >= 6), by = c("match_id" = "match_id", 
+                                               "bucketed_over" = "bucketed_over")) %>% 
+  group_by(bucketed_over, match_id) %>% 
+  mutate(starting_rrr = first(required_run_rate), 
+         ending_rrr = last(required_run_rate), 
+         diff = ending_rrr-starting_rrr, 
+  			 batsman_partner_Maxwell = if_else(batsman_id == 325026, "Batsman", "Partner")) %>% 
+  group_by(bucketed_over, batsman_partner_Maxwell) %>% 
+  summarise(avg_Maxwell = mean(diff)) %>% 
+  ungroup()) %>% 
+	mutate(batsman_name = "Maxwell", 
+				 avg = avg_Maxwell, 
+				 batsman_partner = batsman_partner_Maxwell) %>% 
+	dplyr::select(c(batsman_name, avg, batsman_partner, bucketed_over))
+
+
+	
+dhoni <-
+  cricjam_data_big %>% 
+  dplyr::filter(batsman_id %in% 28081, 
+                inning == 2, 
+  							resources>10,
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                over < 16,
+                over >= 6 
+                # batsman_balls_faced_this_match==1, 
+                # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+  ) %>% 
+  distinct(match_id, bucketed_over) %>% 
+  left_join(cricjam_data_big %>% 
+              dplyr::filter(inning == 2, 
+                            !is.infinite(required_run_rate), 
+                            over < 16,
+              							resources>10,
+                            over >= 6), by = c("match_id" = "match_id", 
+                                               "bucketed_over" = "bucketed_over")) %>% 
+  group_by(bucketed_over, match_id) %>% 
+  mutate(starting_rrr = first(required_run_rate), 
+         ending_rrr = last(required_run_rate), 
+         diff = ending_rrr-starting_rrr) %>% 
+  group_by(bucketed_over) %>% 
+  summarise(avg_Dhoni = mean(diff)) %>% 
+	mutate(batsman_partner_Dhoni = "Partnership") %>% 
+	bind_rows(cricjam_data_big %>% 
+							dplyr::filter(batsman_id %in% 28081, 
+                inning == 2, 
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                over < 16,
+														resources>10,
+                over >= 6 
+                # batsman_balls_faced_this_match==1, 
+                # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+  ) %>% 
+  distinct(match_id, bucketed_over) %>% 
+  left_join(cricjam_data_big %>% 
+              dplyr::filter(inning == 2, 
+                            !is.infinite(required_run_rate), 
+                            over < 16,
+              							resources>10,
+                            over >= 6), by = c("match_id" = "match_id", 
+                                               "bucketed_over" = "bucketed_over")) %>% 
+  group_by(bucketed_over, match_id) %>% 
+  mutate(starting_rrr = first(required_run_rate), 
+         ending_rrr = last(required_run_rate), 
+         diff = ending_rrr-starting_rrr, 
+  			 batsman_partner_Dhoni = if_else(batsman_id == 28081, "Batsman", "Partner")) %>% 
+  group_by(bucketed_over, batsman_partner_Dhoni) %>% 
+  summarise(avg_Dhoni = mean(diff)) %>% 
+  ungroup()) %>% 
+	mutate(batsman_name = "Dhoni", 
+				 avg = avg_Dhoni, 
+				 batsman_partner = batsman_partner_Dhoni) %>% 
+	dplyr::select(c(batsman_name, avg, batsman_partner, bucketed_over))
+
+
+# sharma <-
+#   cricjam_data_big %>% 
+#   dplyr::filter(batsman_id %in% 34102, 
+#                 inning == 2, 
+#                 # batsman_balls_faced_this_match<16, 
+#                 !is.infinite(required_run_rate), 
+#                 over < 16,
+#                 over >= 6 
+#                 # batsman_balls_faced_this_match==1, 
+#                 # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+#   ) %>% 
+#   distinct(match_id, bucketed_over) %>% 
+#   left_join(cricjam_data_big %>% 
+#               dplyr::filter(inning == 2, 
+#                             !is.infinite(required_run_rate), 
+#                             over < 16,
+#                             over >= 6), by = c("match_id" = "match_id", 
+#                                                "bucketed_over" = "bucketed_over")) %>% 
+#   group_by(bucketed_over, match_id) %>% 
+#   mutate(starting_rrr = first(required_run_rate), 
+#          ending_rrr = last(required_run_rate), 
+#          diff = ending_rrr-starting_rrr) %>% 
+#   group_by(bucketed_over) %>% 
+#   summarise(avg_Sharma = mean(diff)) %>% 
+# 	mutate(batsman_partner_Sharma = "Partnership") %>% 
+# 	bind_rows(cricjam_data_big %>% 
+# 							dplyr::filter(batsman_id %in% 34102, 
+#                 inning == 2, 
+#                 # batsman_balls_faced_this_match<16, 
+#                 !is.infinite(required_run_rate), 
+#                 over < 16,
+#                 over >= 6 
+#                 # batsman_balls_faced_this_match==1, 
+#                 # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+#   ) %>% 
+#   distinct(match_id, bucketed_over) %>% 
+#   left_join(cricjam_data_big %>% 
+#               dplyr::filter(inning == 2, 
+#                             !is.infinite(required_run_rate), 
+#                             over < 16,
+#                             over >= 6), by = c("match_id" = "match_id", 
+#                                                "bucketed_over" = "bucketed_over")) %>% 
+#   group_by(bucketed_over, match_id) %>% 
+#   mutate(starting_rrr = first(required_run_rate), 
+#          ending_rrr = last(required_run_rate), 
+#          diff = ending_rrr-starting_rrr, 
+#   			 batsman_partner_Sharma = if_else(batsman_id == 34102, "Batsman", "Partner")) %>% 
+#   group_by(bucketed_over, batsman_partner_Sharma) %>% 
+#   summarise(avg_Sharma = mean(diff)) %>% 
+#   ungroup()) %>% 
+# 	mutate(batsman_name = "Sharma", 
+# 				 avg = avg_Sharma, 
+# 				 batsman_partner = batsman_partner_Sharma) %>% 
+# 	dplyr::select(c(batsman_name, avg, batsman_partner, bucketed_over))
+
+
+# watson <-
+#   cricjam_data_big %>% 
+#   dplyr::filter(batsman_id %in% 8180, 
+#                 inning == 2, 
+#                 # batsman_balls_faced_this_match<16, 
+#                 !is.infinite(required_run_rate), 
+#                 over < 16,
+#                 over >= 6 
+#                 # batsman_balls_faced_this_match==1, 
+#                 # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+#   ) %>% 
+#   distinct(match_id, bucketed_over) %>% 
+#   left_join(cricjam_data_big %>% 
+#               dplyr::filter(inning == 2, 
+#                             !is.infinite(required_run_rate), 
+#                             over < 16,
+#                             over >= 6), by = c("match_id" = "match_id", 
+#                                                "bucketed_over" = "bucketed_over")) %>% 
+#   group_by(bucketed_over, match_id) %>% 
+#   mutate(starting_rrr = first(required_run_rate), 
+#          ending_rrr = last(required_run_rate), 
+#          diff = ending_rrr-starting_rrr) %>% 
+#   group_by(bucketed_over) %>% 
+#   summarise(avg_Watson = mean(diff)) %>% 
+# 	mutate(batsman_partner_Watson = "Partnership") %>% 
+# 	bind_rows(cricjam_data_big %>% 
+# 							dplyr::filter(batsman_id %in% 8180, 
+#                 inning == 2, 
+#                 # batsman_balls_faced_this_match<16, 
+#                 !is.infinite(required_run_rate), 
+#                 over < 16,
+#                 over >= 6 
+#                 # batsman_balls_faced_this_match==1, 
+#                 # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+#   ) %>% 
+#   distinct(match_id, bucketed_over) %>% 
+#   left_join(cricjam_data_big %>% 
+#               dplyr::filter(inning == 2, 
+#                             !is.infinite(required_run_rate), 
+#                             over < 16,
+#                             over >= 6), by = c("match_id" = "match_id", 
+#                                                "bucketed_over" = "bucketed_over")) %>% 
+#   group_by(bucketed_over, match_id) %>% 
+#   mutate(starting_rrr = first(required_run_rate), 
+#          ending_rrr = last(required_run_rate), 
+#          diff = ending_rrr-starting_rrr, 
+#   			 batsman_partner_Watson = if_else(batsman_id == 8180, "Batsman", "Partner")) %>% 
+#   group_by(bucketed_over, batsman_partner_Watson) %>% 
+#   summarise(avg_Watson = mean(diff)) %>% 
+#   ungroup()) %>% 
+# 	mutate(batsman_name = "Watson", 
+# 				 avg = avg_Watson, 
+# 				 batsman_partner = batsman_partner_Watson) %>% 
+# 	dplyr::select(c(batsman_name, avg, batsman_partner, bucketed_over))
+
+
+russell <-
+  cricjam_data_big %>% 
+  dplyr::filter(batsman_id %in% 276298, 
+                inning == 2, 
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                over < 16,
+  							resources>10,
+                over >= 6 
+                # batsman_balls_faced_this_match==1, 
+                # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+  ) %>% 
+  distinct(match_id, bucketed_over) %>% 
+  left_join(cricjam_data_big %>% 
+              dplyr::filter(inning == 2, 
+                            !is.infinite(required_run_rate), 
+                            over < 16,
+              							resources>10,
+                            over >= 6), by = c("match_id" = "match_id", 
+                                               "bucketed_over" = "bucketed_over")) %>% 
+  group_by(bucketed_over, match_id) %>% 
+  mutate(starting_rrr = first(required_run_rate), 
+         ending_rrr = last(required_run_rate), 
+         diff = ending_rrr-starting_rrr) %>% 
+  group_by(bucketed_over) %>% 
+  summarise(avg_Russell = mean(diff)) %>% 
+	mutate(batsman_partner_Russell = "Partnership") %>% 
+	bind_rows(cricjam_data_big %>% 
+							dplyr::filter(batsman_id %in% 276298, 
+                inning == 2, 
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                over < 16,
+														resources>10,
+                over >= 6 
+                # batsman_balls_faced_this_match==1, 
+                # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+  ) %>% 
+  distinct(match_id, bucketed_over) %>% 
+  left_join(cricjam_data_big %>% 
+              dplyr::filter(inning == 2, 
+                            !is.infinite(required_run_rate), 
+                            over < 16,
+              							resources>10,
+                            over >= 6), by = c("match_id" = "match_id", 
+                                               "bucketed_over" = "bucketed_over")) %>% 
+  group_by(bucketed_over, match_id) %>% 
+  mutate(starting_rrr = first(required_run_rate), 
+         ending_rrr = last(required_run_rate), 
+         diff = ending_rrr-starting_rrr, 
+  			 batsman_partner_Russell = if_else(batsman_id == 276298, "Batsman", "Partner")) %>% 
+  group_by(bucketed_over, batsman_partner_Russell) %>% 
+  summarise(avg_Russell = mean(diff)) %>% 
+  ungroup()) %>% 
+	mutate(batsman_name = "Russell", 
+				 avg = avg_Russell, 
+				 batsman_partner = batsman_partner_Russell) %>% 
+	dplyr::select(c(batsman_name, avg, batsman_partner, bucketed_over))
+
+
+# villiers <-
+#   cricjam_data_big %>% 
+#   dplyr::filter(batsman_id %in% 44936, 
+#                 inning == 2, 
+#                 # batsman_balls_faced_this_match<16, 
+#                 !is.infinite(required_run_rate), 
+#                 over < 16,
+#                 over >= 6 
+#                 # batsman_balls_faced_this_match==1, 
+#                 # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+#   ) %>% 
+#   distinct(match_id, bucketed_over) %>% 
+#   left_join(cricjam_data_big %>% 
+#               dplyr::filter(inning == 2, 
+#                             !is.infinite(required_run_rate), 
+#                             over < 16,
+#                             over >= 6), by = c("match_id" = "match_id", 
+#                                                "bucketed_over" = "bucketed_over")) %>% 
+#   group_by(bucketed_over, match_id) %>% 
+#   mutate(starting_rrr = first(required_run_rate), 
+#          ending_rrr = last(required_run_rate), 
+#          diff = ending_rrr-starting_rrr) %>% 
+#   group_by(bucketed_over) %>% 
+#   summarise(avg_DeVilliers = mean(diff)) %>% 
+# 	mutate(batsman_partner_DeVilliers = "Partnership") %>% 
+# 	bind_rows(cricjam_data_big %>% 
+# 							dplyr::filter(batsman_id %in% 44936, 
+#                 inning == 2, 
+#                 # batsman_balls_faced_this_match<16, 
+#                 !is.infinite(required_run_rate), 
+#                 over < 16,
+#                 over >= 6 
+#                 # batsman_balls_faced_this_match==1, 
+#                 # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+#   ) %>% 
+#   distinct(match_id, bucketed_over) %>% 
+#   left_join(cricjam_data_big %>% 
+#               dplyr::filter(inning == 2, 
+#                             !is.infinite(required_run_rate), 
+#                             over < 16,
+#                             over >= 6), by = c("match_id" = "match_id", 
+#                                                "bucketed_over" = "bucketed_over")) %>% 
+#   group_by(bucketed_over, match_id) %>% 
+#   mutate(starting_rrr = first(required_run_rate), 
+#          ending_rrr = last(required_run_rate), 
+#          diff = ending_rrr-starting_rrr, 
+#   			 batsman_partner_DeVilliers = if_else(batsman_id == 44936, "Batsman", "Partner")) %>% 
+#   group_by(bucketed_over, batsman_partner_DeVilliers) %>% 
+#   summarise(avg_DeVilliers = mean(diff)) %>% 
+#   ungroup()) %>% 
+# 	mutate(batsman_name = "DeVilliers", 
+# 				 avg = avg_DeVilliers, 
+# 				 batsman_partner = batsman_partner_DeVilliers) %>% 
+# 	dplyr::select(c(batsman_name, avg, batsman_partner, bucketed_over))
+
+
+# miller <-
+#   cricjam_data_big %>% 
+#   dplyr::filter(batsman_id %in% 321777, 
+#                 inning == 2, 
+#                 # batsman_balls_faced_this_match<16, 
+#                 !is.infinite(required_run_rate), 
+#                 over < 16,
+#                 over >= 6 
+#                 # batsman_balls_faced_this_match==1, 
+#                 # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+#   ) %>% 
+#   distinct(match_id, bucketed_over) %>% 
+#   left_join(cricjam_data_big %>% 
+#               dplyr::filter(inning == 2, 
+#                             !is.infinite(required_run_rate), 
+#                             over < 16,
+#                             over >= 6), by = c("match_id" = "match_id", 
+#                                                "bucketed_over" = "bucketed_over")) %>% 
+#   group_by(bucketed_over, match_id) %>% 
+#   mutate(starting_rrr = first(required_run_rate), 
+#          ending_rrr = last(required_run_rate), 
+#          diff = ending_rrr-starting_rrr) %>% 
+#   group_by(bucketed_over) %>% 
+#   summarise(avg_Miller = mean(diff)) %>% 
+# 	mutate(batsman_partner_Miller = "Partnership") %>% 
+# 	bind_rows(cricjam_data_big %>% 
+# 							dplyr::filter(batsman_id %in% 321777, 
+#                 inning == 2, 
+#                 # batsman_balls_faced_this_match<16, 
+#                 !is.infinite(required_run_rate), 
+#                 over < 16,
+#                 over >= 6 
+#                 # batsman_balls_faced_this_match==1, 
+#                 # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+#   ) %>% 
+#   distinct(match_id, bucketed_over) %>% 
+#   left_join(cricjam_data_big %>% 
+#               dplyr::filter(inning == 2, 
+#                             !is.infinite(required_run_rate), 
+#                             over < 16,
+#                             over >= 6), by = c("match_id" = "match_id", 
+#                                                "bucketed_over" = "bucketed_over")) %>% 
+#   group_by(bucketed_over, match_id) %>% 
+#   mutate(starting_rrr = first(required_run_rate), 
+#          ending_rrr = last(required_run_rate), 
+#          diff = ending_rrr-starting_rrr, 
+#   			 batsman_partner_Miller = if_else(batsman_id == 321777, "Batsman", "Partner")) %>% 
+#   group_by(bucketed_over, batsman_partner_Miller) %>% 
+#   summarise(avg_Miller = mean(diff)) %>% 
+#   ungroup()) %>% 
+# 	mutate(batsman_name = "Miller", 
+# 				 avg = avg_Miller, 
+# 				 batsman_partner = batsman_partner_Miller) %>% 
+# 	dplyr::select(c(batsman_name, avg, batsman_partner, bucketed_over))
+
+
+# pathan <-
+#   cricjam_data_big %>% 
+#   dplyr::filter(batsman_id %in% 32498, 
+#                 inning == 2, 
+#                 # batsman_balls_faced_this_match<16, 
+#                 !is.infinite(required_run_rate), 
+#                 over < 16,
+#                 over >= 6 
+#                 # batsman_balls_faced_this_match==1, 
+#                 # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+#   ) %>% 
+#   distinct(match_id, bucketed_over) %>% 
+#   left_join(cricjam_data_big %>% 
+#               dplyr::filter(inning == 2, 
+#                             !is.infinite(required_run_rate), 
+#                             over < 16,
+#                             over >= 6), by = c("match_id" = "match_id", 
+#                                                "bucketed_over" = "bucketed_over")) %>% 
+#   group_by(bucketed_over, match_id) %>% 
+#   mutate(starting_rrr = first(required_run_rate), 
+#          ending_rrr = last(required_run_rate), 
+#          diff = ending_rrr-starting_rrr) %>% 
+#   group_by(bucketed_over) %>% 
+#   summarise(avg_Pathan = mean(diff)) %>% 
+# 	mutate(batsman_partner_Pathan = "Partnership") %>% 
+# 	bind_rows(cricjam_data_big %>% 
+# 							dplyr::filter(batsman_id %in% 32498, 
+#                 inning == 2, 
+#                 # batsman_balls_faced_this_match<16, 
+#                 !is.infinite(required_run_rate), 
+#                 over < 16,
+#                 over >= 6 
+#                 # batsman_balls_faced_this_match==1, 
+#                 # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+#   ) %>% 
+#   distinct(match_id, bucketed_over) %>% 
+#   left_join(cricjam_data_big %>% 
+#               dplyr::filter(inning == 2, 
+#                             !is.infinite(required_run_rate), 
+#                             over < 16,
+#                             over >= 6), by = c("match_id" = "match_id", 
+#                                                "bucketed_over" = "bucketed_over")) %>% 
+#   group_by(bucketed_over, match_id) %>% 
+#   mutate(starting_rrr = first(required_run_rate), 
+#          ending_rrr = last(required_run_rate), 
+#          diff = ending_rrr-starting_rrr, 
+#   			 batsman_partner_Pathan = if_else(batsman_id == 32498, "Batsman", "Partner")) %>% 
+#   group_by(bucketed_over, batsman_partner_Pathan) %>% 
+#   summarise(avg_Pathan = mean(diff)) %>% 
+#   ungroup())%>% 
+# 	mutate(batsman_name = "Pathan", 
+# 				 avg = avg_Pathan, 
+# 				 batsman_partner = batsman_partner_Pathan) %>% 
+# 	dplyr::select(c(batsman_name, avg, batsman_partner, bucketed_over))
+
+
+pollard <-
+  cricjam_data_big %>% 
+  dplyr::filter(batsman_id %in% 230559, 
+                inning == 2, 
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                over < 16,
+  							resources>10,
+                over >= 6 
+                # batsman_balls_faced_this_match==1, 
+                # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+  ) %>% 
+  distinct(match_id, bucketed_over) %>% 
+  left_join(cricjam_data_big %>% 
+              dplyr::filter(inning == 2, 
+                            !is.infinite(required_run_rate), 
+                            over < 16,
+              							resources>10,
+                            over >= 6), by = c("match_id" = "match_id", 
+                                               "bucketed_over" = "bucketed_over")) %>% 
+  group_by(bucketed_over, match_id) %>% 
+  mutate(starting_rrr = first(required_run_rate), 
+         ending_rrr = last(required_run_rate), 
+         diff = ending_rrr-starting_rrr) %>% 
+  group_by(bucketed_over) %>% 
+  summarise(avg_Pollard = mean(diff)) %>% 
+	mutate(batsman_partner_Pollard = "Partnership") %>% 
+	bind_rows(cricjam_data_big %>% 
+							dplyr::filter(batsman_id %in% 230559, 
+                inning == 2, 
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                over < 16,
+														resources>10,
+                over >= 6 
+                # batsman_balls_faced_this_match==1, 
+                # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+  ) %>% 
+  distinct(match_id, bucketed_over) %>% 
+  left_join(cricjam_data_big %>% 
+              dplyr::filter(inning == 2, 
+                            !is.infinite(required_run_rate), 
+                            over < 16,resources>10,
+                            over >= 6), by = c("match_id" = "match_id", 
+                                               "bucketed_over" = "bucketed_over")) %>% 
+  group_by(bucketed_over, match_id) %>% 
+  mutate(starting_rrr = first(required_run_rate), 
+         ending_rrr = last(required_run_rate), 
+         diff = ending_rrr-starting_rrr, 
+  			 batsman_partner_Pollard = if_else(batsman_id == 230559, "Batsman", "Partner")) %>% 
+  group_by(bucketed_over, batsman_partner_Pollard) %>% 
+  summarise(avg_Pollard = mean(diff)) %>% 
+  ungroup()) %>% 
+	mutate(batsman_name = "Pollard", 
+				 avg = avg_Pollard, 
+				 batsman_partner = batsman_partner_Pollard) %>% 
+	dplyr::select(c(batsman_name, avg, batsman_partner, bucketed_over))
+
+# marsh <- 
+#   cricjam_data_big %>% 
+#   dplyr::filter(batsman_id %in% 272450, 
+#                 inning == 2, 
+#                 # batsman_balls_faced_this_match<16, 
+#                 !is.infinite(required_run_rate), 
+#                 over < 16,
+#                 over >= 6 
+#                 # batsman_balls_faced_this_match==1, 
+#                 # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+#   ) %>% 
+#   distinct(match_id, bucketed_over) %>% 
+#   left_join(cricjam_data_big %>% 
+#               dplyr::filter(inning == 2, 
+#                             !is.infinite(required_run_rate), 
+#                             over < 16,
+#                             over >= 6), by = c("match_id" = "match_id", 
+#                                                "bucketed_over" = "bucketed_over")) %>% 
+#   group_by(bucketed_over, match_id) %>% 
+#   mutate(starting_rrr = first(required_run_rate), 
+#          ending_rrr = last(required_run_rate), 
+#          diff = ending_rrr-starting_rrr) %>% 
+#   group_by(bucketed_over) %>% 
+#   summarise(avg_Marsh = mean(diff)) %>% 
+# 	mutate(batsman_partner_Marsh = "Partnership") %>% 
+# 	bind_rows(cricjam_data_big %>% 
+# 							dplyr::filter(batsman_id %in% 272450, 
+#                 inning == 2, 
+#                 # batsman_balls_faced_this_match<16, 
+#                 !is.infinite(required_run_rate), 
+#                 over < 16,
+#                 over >= 6 
+#                 # batsman_balls_faced_this_match==1, 
+#                 # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+#   ) %>% 
+#   distinct(match_id, bucketed_over) %>% 
+#   left_join(cricjam_data_big %>% 
+#               dplyr::filter(inning == 2, 
+#                             !is.infinite(required_run_rate), 
+#                             over < 16,
+#                             over >= 6), by = c("match_id" = "match_id", 
+#                                                "bucketed_over" = "bucketed_over")) %>% 
+#   group_by(bucketed_over, match_id) %>% 
+#   mutate(starting_rrr = first(required_run_rate), 
+#          ending_rrr = last(required_run_rate), 
+#          diff = ending_rrr-starting_rrr, 
+#   			 batsman_partner_Marsh = if_else(batsman_id == 272450, "Batsman", "Partner")) %>% 
+#   group_by(bucketed_over, batsman_partner_Marsh) %>% 
+#   summarise(avg_Marsh = mean(diff)) %>% 
+#   ungroup()) %>% 
+# 	mutate(batsman_name = "Marsh", 
+# 				 avg = avg_Marsh, 
+# 				 batsman_partner = batsman_partner_Marsh) %>% 
+# 	dplyr::select(c(batsman_name, avg, batsman_partner, bucketed_over))
+
+pollard %>% 
+	bind_rows(maxwell, dhoni, russell) %>% 
+	ggplot(aes(x = bucketed_over, y = avg, group = batsman_partner, color = batsman_partner)) +
+  geom_smooth()+
+  geom_hline(yintercept = 0)+
+  labs(y = "Required Run Rate", 
+       x = "Over", 
+       title = "Change in Required Run Rate While Batting (or Partnering)", 
+  		 color = "")+
+  facet_wrap(~batsman_name)+
+  theme_minimal()+
+  theme(axis.text = element_text(size = 12), 
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size = 16)) 
+
+
+```
+
+
+
+```{r}
+
+middle_batsman_of_interest <- c(
+  230559, #pollard
+  32498, #yusef pathan
+  321777, #david miller
+  44936, #AB De Villiers
+  276298, #andre russell
+  8180, #shane watson
+  34102, #rohit sharma
+  28081, #Dhoni
+  325026 #maxwell
+  )  
+maxwell <-
+  cricjam_data_big %>% 
+  dplyr::filter(batsman_id %in% 325026, 
+                inning == 2, 
+  							resources>10,
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                # over < 16,
+                over >= 16 
+                # batsman_balls_faced_this_match==1, 
+                # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+  ) %>% 
+  distinct(match_id, bucketed_over) %>% 
+  left_join(cricjam_data_big %>% 
+              dplyr::filter(inning == 2, 
+              							resources>10,
+                            !is.infinite(required_run_rate), 
+                            # over < 16,
+                over >= 16 ), by = c("match_id" = "match_id", 
+                                               "bucketed_over" = "bucketed_over")) %>% 
+  group_by(bucketed_over, match_id) %>% 
+  mutate(starting_rrr = first(required_run_rate), 
+         ending_rrr = last(required_run_rate), 
+         diff = ending_rrr-starting_rrr) %>% 
+  group_by(bucketed_over) %>% 
+  summarise(avg_Maxwell = mean(diff))  %>% 
+	mutate(batsman_partner_Maxwell = "Partnership") %>% 
+	bind_rows(cricjam_data_big %>% 
+							dplyr::filter(batsman_id %in% 325026, 
+                inning == 2, 
+														resources>10,
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                # over < 16,
+                over >= 16 
+                # batsman_balls_faced_this_match==1, 
+                # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+  ) %>% 
+  distinct(match_id, bucketed_over) %>% 
+  left_join(cricjam_data_big %>% 
+              dplyr::filter(inning == 2, 
+              							resources>10,
+                            !is.infinite(required_run_rate), 
+                            # over < 16,
+                over >= 16 ), by = c("match_id" = "match_id", 
+                                               "bucketed_over" = "bucketed_over")) %>% 
+  group_by(bucketed_over, match_id) %>% 
+  mutate(starting_rrr = first(required_run_rate), 
+         ending_rrr = last(required_run_rate), 
+         diff = ending_rrr-starting_rrr, 
+  			 batsman_partner_Maxwell = if_else(batsman_id == 325026, "Batsman", "Partner")) %>% 
+  group_by(bucketed_over, batsman_partner_Maxwell) %>% 
+  summarise(avg_Maxwell = mean(diff)) %>% 
+  ungroup()) %>% 
+	mutate(batsman_name = "Maxwell", 
+				 avg = avg_Maxwell, 
+				 batsman_partner = batsman_partner_Maxwell) %>% 
+	dplyr::select(c(batsman_name, avg, batsman_partner, bucketed_over))
+
+
+	
+dhoni <-
+  cricjam_data_big %>% 
+  dplyr::filter(batsman_id %in% 28081, 
+                inning == 2, 
+  							resources>10,
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                # over < 16,
+                over >= 16  
+                # batsman_balls_faced_this_match==1, 
+                # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+  ) %>% 
+  distinct(match_id, bucketed_over) %>% 
+  left_join(cricjam_data_big %>% 
+              dplyr::filter(inning == 2, 
+              							resources>10,
+                            !is.infinite(required_run_rate), 
+                            # over < 16,
+                over >= 16 ), by = c("match_id" = "match_id", 
+                                               "bucketed_over" = "bucketed_over")) %>% 
+  group_by(bucketed_over, match_id) %>% 
+  mutate(starting_rrr = first(required_run_rate), 
+         ending_rrr = last(required_run_rate), 
+         diff = ending_rrr-starting_rrr) %>% 
+  group_by(bucketed_over) %>% 
+  summarise(avg_Dhoni = mean(diff), 
+  					total = n()) %>% 
+	mutate(batsman_partner_Dhoni = "Partnership") %>% 
+	bind_rows(cricjam_data_big %>% 
+							dplyr::filter(batsman_id %in% 28081, 
+                inning == 2, 
+														resources>10,
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                # over < 16,
+                over >= 16 
+                # batsman_balls_faced_this_match==1, 
+                # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+  ) %>% 
+  distinct(match_id, bucketed_over) %>% 
+  left_join(cricjam_data_big %>% 
+              dplyr::filter(inning == 2, 
+              							resources>10,
+                            !is.infinite(required_run_rate), 
+                            # over < 16,
+                over >= 16 ), by = c("match_id" = "match_id", 
+                                               "bucketed_over" = "bucketed_over")) %>% 
+  group_by(bucketed_over, match_id) %>% 
+  mutate(starting_rrr = first(required_run_rate), 
+         ending_rrr = last(required_run_rate), 
+         diff = ending_rrr-starting_rrr, 
+  			 batsman_partner_Dhoni = if_else(batsman_id == 28081, "Batsman", "Partner")) %>% 
+  group_by(bucketed_over, batsman_partner_Dhoni) %>% 
+  summarise(avg_Dhoni = mean(diff), 
+  					total = n()) %>% 
+  ungroup()) %>% 
+	mutate(batsman_name = "Dhoni", 
+				 avg = avg_Dhoni, 
+				 batsman_partner = batsman_partner_Dhoni) %>% 
+	dplyr::select(c(batsman_name, avg, batsman_partner, bucketed_over))
+
+
+russell <-
+  cricjam_data_big %>% 
+  dplyr::filter(batsman_id %in% 276298, 
+                inning == 2, 
+  							resources>10,
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                # over < 16,
+                over >= 16 
+                # batsman_balls_faced_this_match==1, 
+                # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+  ) %>% 
+  distinct(match_id, bucketed_over) %>% 
+  left_join(cricjam_data_big %>% 
+              dplyr::filter(inning == 2, 
+              							resources>10,
+                            !is.infinite(required_run_rate), 
+                            # over < 16,
+                over >= 16 ), by = c("match_id" = "match_id", 
+                                               "bucketed_over" = "bucketed_over")) %>% 
+  group_by(bucketed_over, match_id) %>% 
+  mutate(starting_rrr = first(required_run_rate), 
+         ending_rrr = last(required_run_rate), 
+         diff = ending_rrr-starting_rrr) %>% 
+  group_by(bucketed_over) %>% 
+  summarise(avg_Russell = mean(diff)) %>% 
+	mutate(batsman_partner_Russell = "Partnership") %>% 
+	bind_rows(cricjam_data_big %>% 
+							dplyr::filter(batsman_id %in% 276298, 
+                inning == 2, 
+														resources>10,
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                # over < 16,
+                over >= 16 
+                # batsman_balls_faced_this_match==1, 
+                # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+  ) %>% 
+  distinct(match_id, bucketed_over) %>% 
+  left_join(cricjam_data_big %>% 
+              dplyr::filter(inning == 2, 
+              							resources>10,
+                            !is.infinite(required_run_rate), 
+                            # over < 16,
+                over >= 16 ), by = c("match_id" = "match_id", 
+                                               "bucketed_over" = "bucketed_over")) %>% 
+  group_by(bucketed_over, match_id) %>% 
+  mutate(starting_rrr = first(required_run_rate), 
+         ending_rrr = last(required_run_rate), 
+         diff = ending_rrr-starting_rrr, 
+  			 batsman_partner_Russell = if_else(batsman_id == 276298, "Batsman", "Partner")) %>% 
+  group_by(bucketed_over, batsman_partner_Russell) %>% 
+  summarise(avg_Russell = mean(diff)) %>% 
+  ungroup()) %>% 
+	mutate(batsman_name = "Russell", 
+				 avg = avg_Russell, 
+				 batsman_partner = batsman_partner_Russell) %>% 
+	dplyr::select(c(batsman_name, avg, batsman_partner, bucketed_over))
+
+
+pollard <-
+  cricjam_data_big %>% 
+  dplyr::filter(batsman_id %in% 230559, 
+  							resources>10,
+                inning == 2, 
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+                # over < 16,
+                over >= 16 
+                # batsman_balls_faced_this_match==1, 
+                # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+  ) %>% 
+  distinct(match_id, bucketed_over) %>% 
+  left_join(cricjam_data_big %>% 
+              dplyr::filter(inning == 2, 
+              							resources>10,
+                            !is.infinite(required_run_rate), 
+                            # over < 16,
+                over >= 16 ), by = c("match_id" = "match_id", 
+                                               "bucketed_over" = "bucketed_over")) %>% 
+  group_by(bucketed_over, match_id) %>% 
+  mutate(starting_rrr = first(required_run_rate), 
+         ending_rrr = last(required_run_rate), 
+         diff = ending_rrr-starting_rrr) %>% 
+  group_by(bucketed_over) %>% 
+  summarise(avg_Pollard = mean(diff)) %>% 
+	mutate(batsman_partner_Pollard = "Partnership") %>% 
+	bind_rows(cricjam_data_big %>% 
+							dplyr::filter(batsman_id %in% 230559, 
+                inning == 2, 
+														resources>10,
+                # batsman_balls_faced_this_match<16, 
+                !is.infinite(required_run_rate), 
+# over < 16,
+                over >= 16 
+                # batsman_balls_faced_this_match==1, 
+                # year %in% c("2017", "2018", "2019", "20172018", "20182019", "2020", "20192020")
+  ) %>% 
+  distinct(match_id, bucketed_over) %>% 
+  left_join(cricjam_data_big %>% 
+              dplyr::filter(inning == 2, 
+              							resources>10,
+                            !is.infinite(required_run_rate), 
+                            # over < 16,
+                over >= 16 ), by = c("match_id" = "match_id", 
+                                               "bucketed_over" = "bucketed_over")) %>% 
+  group_by(bucketed_over, match_id) %>% 
+  mutate(starting_rrr = first(required_run_rate), 
+         ending_rrr = last(required_run_rate), 
+         diff = ending_rrr-starting_rrr, 
+  			 batsman_partner_Pollard = if_else(batsman_id == 230559, "Batsman", "Partner")) %>% 
+  group_by(bucketed_over, batsman_partner_Pollard) %>% 
+  summarise(avg_Pollard = mean(diff)) %>% 
+  ungroup()) %>% 
+	mutate(batsman_name = "Pollard", 
+				 avg = avg_Pollard, 
+				 batsman_partner = batsman_partner_Pollard) %>% 
+	dplyr::select(c(batsman_name, avg, batsman_partner, bucketed_over))
+
+pollard %>% 
+	bind_rows(maxwell, dhoni, russell) %>%
+	# dplyr::filter(bucketed_over <20) %>% 
+	ggplot(aes(x = bucketed_over, y = avg, group = batsman_partner, color = batsman_partner)) +
+  geom_smooth()+
+  geom_hline(yintercept = 0)+
+  labs(y = "Required Run Rate", 
+       x = "Over", 
+       title = "Change in Required Run Rate While Batting (or Partnering)", 
+  		 color = "")+
+  facet_wrap(~batsman_name)+
+  theme_minimal()+
+  theme(axis.text = element_text(size = 12), 
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size = 16)) 
+
+
+```
+
+What we can tell is that in second inning chases, the required run rate for Dhoni is lower than our other top middle order batsmen, contrasting our inital findings. One would assume that this was due to Dhoni's partners, but it appears he still performs at an elite level
+
 
 ## notes for James
 
