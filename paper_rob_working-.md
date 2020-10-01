@@ -54,11 +54,26 @@ We can also use waRne and other R packages as an easy way to engage students in 
 
 For example using the above we can not only look at the answers graphically, but we can run a statistical test. A common classroom example for learning the binomial distribution is to ask if a coin is based given a proportion of heads and tails given a sample size [@mcelreath2020statistical]. Instead of asking about coins, fans of sport and cricket might be interested to ask the question; after winning the coin toss, should a team decide to bat first or bat second.
 
-While a coin toss is a seemingly trivial example, like in most professional sports the winner of the coin toss gets to decide what to do. In cricket, the winner of the coin toss gets to decide if they want to bat first and thus set the total that the opposition needs to pass by a single run to win, or if they want to bowl first and thus chase down the total set. Deciding what to do after winning a coin toss has proved to be a popular media piece in recent years \\footnote{[https://www.espncricinfo.com/video/clip/\_/id/23230682](https://www.espncricinfo.com/video/clip/_/id/23230682])} \^[[https://www.espncricinfo.com/story/\_/id/21489056/stuart-wark-cricket-move-away-coin-toss?]](https://www.espncricinfo.com/story/_/id/21489056/stuart-wark-cricket-move-away-coin-toss?%5D) \^[[https://www.espncricinfo.com/story/\_/id/20429499/lehmann-backs-scrapping-toss]](https://www.espncricinfo.com/story/_/id/20429499/lehmann-backs-scrapping-toss%5D) \^[[https://www.espncricinfo.com/story/\_/id/28770755/how-much-does-losing-tosses-impact-visiting-teams]](https://www.espncricinfo.com/story/_/id/28770755/how-much-does-losing-tosses-impact-visiting-teams%5D) \^[<https://www.forbes.com/sites/tristanlavalette/2018/08/20/are-cricket-matches-being-decided-by-the-luck-of-a-coin-toss/#735456837eff>]
+While a coin toss is a seemingly trivial example, like in most professional sports the winner of the coin toss gets to decide what to do. In cricket, the winner of the coin toss gets to decide if they want to bat first and thus set the total that the opposition needs to pass by a single run to win, or if they want to bowl first and thus chase down the total set. Deciding what to do after winning a coin toss has proved to be a popular media piece in recent years \footnote{https://www.espncricinfo.com/video/clip/\_/id/23230682}
+
+
+(https://www.espncricinfo.com/video/clip/_/id/23230682%5D)} \^[[https://www.espncricinfo.com/story/\_/id/21489056/stuart-wark-cricket-move-away-coin-toss?]](https://www.espncricinfo.com/story/_/id/21489056/stuart-wark-cricket-move-away-coin-toss?%5D) \^[[https://www.espncricinfo.com/story/\_/id/20429499/lehmann-backs-scrapping-toss]](https://www.espncricinfo.com/story/_/id/20429499/lehmann-backs-scrapping-toss%5D) \^[[https://www.espncricinfo.com/story/\_/id/28770755/how-much-does-losing-tosses-impact-visiting-teams]](https://www.espncricinfo.com/story/_/id/28770755/how-much-does-losing-tosses-impact-visiting-teams%5D) \^[<https://www.forbes.com/sites/tristanlavalette/2018/08/20/are-cricket-matches-being-decided-by-the-luck-of-a-coin-toss/#735456837eff>]
 
 \^[<https://www.statsinsider.com.au/bbl/how-important-is-winning-the-toss-in-the-big-bash-league>]
 
 \^[<https://www.espncricinfo.com/story/_/id/18568387/tim-wigmore-how-batting-second-become-more-fruitful-more-popular>]
+
+Fans and analysts of the game might want to make this decision based on a simple statistic, for example they might make it based on answer these questions instead.
+
+-   Do teams that bat second have a higher winning percentage than those who bat first?
+
+-   Is this consistent across leagues and levels of cricket?
+
+
+
+Instead of just looking at this graphically, fans of crickets and teachers of undergraduate statistics might use the dataset as a ''biased coin'' example. So instead of asking, given a proportion of heads over \$n\$ tosses instructers could ask is a team better off batting first or second.
+
+
 
 ## Easier engagement of fans
 
@@ -67,6 +82,8 @@ To the surprise of many, its hard to engage cricket fans into the analytics behi
 Without an easy accessible medium how can crickets version of an analytics community grow.
 
 something something look towards how EPA has changed the way fans are engaged in NFL analytics - so maybe the change in run rate can be like EPA?
+
+<https://twitter.com/cricvizanalyst/status/1311260989267087361>
 
 ## Cool cricket examples
 
@@ -77,16 +94,6 @@ something something look towards how EPA has changed the way fans are engaged in
 -   espncricinfo articles but instead of ipl do same tables for big bash
 
 -   recreate stats from espncricinfo like this [page](https://www.espncricinfo.com/series/19297/statistics/1187665/new-zealand-vs-england-1st-t20i-england-in-new-zealand-2019-20)
-
-+------------------------------+--------------------------------------------------------------------------+
-| Things to do                 | person                                                                   |
-+==============================+==========================================================================+
-| clean scrapers/csv for waRne | James                                                                    |
-+------------------------------+--------------------------------------------------------------------------+
-| data dictionary              | Robert                                                                   |
-+------------------------------+--------------------------------------------------------------------------+
-| examples                     | Robert - start (assume same csv being used) - cool cricket example stuff |
-+------------------------------+--------------------------------------------------------------------------+
 
 ## Dhoni Dilemma
 
@@ -106,7 +113,7 @@ This graph makes sense as we can see the best openers in the world lower the req
 
 
 
-Dhoni is renowed for being one of the worlds best closers but we can see it seems as though in the middle he is letting the game get out of hand. How can one of the worlds best closers
+Dhoni is renowed for being one of the worlds best closers but we can see it seems as though in the middle he is letting the game get out of hand. How can one of the worlds best closers consistently put his teams in worse positions?
 
 ## notes for James
 
