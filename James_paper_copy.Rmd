@@ -1,0 +1,483 @@
+---
+title: "waRne - Putting cricket analytics in a spin"
+bibliography: references.bib
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    keep_md: yes
+    toc: yes
+    toc_float: yes
+authors: Robert(1), James (2)
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(out.width = "75%",
+                      dev = "png",
+                      fig.align = "center",
+                      echo = FALSE)
+```
+
+```{r libraries, include=FALSE}
+library(tidyverse)
+library(naniar)
+library(visdat)
+library(patchwork)
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+library(stringr)
+library(curl)
+library(tidyverse)
+library(magrittr)
+library(lubridate)
+library(ggplot2)
+library(ggalt)
+library(gganimate)
+library(gifski)
+player_database <- 
+  read_csv("/Users/James/James/Cricket_Thesis/Data/new_player_database_crickjam.csv") %>% 
+  dplyr::select(player_id, player_name, batting_style, bowling_style) %>% 
+  distinct() %>% 
+  dplyr::filter(player_name != "Rohit Gurunath Sharma") %>% 
+  bind_rows(read_csv("/Users/James/James/Cricket_Thesis/Data/new_player_database_crickjam.csv") %>% 
+              dplyr::filter(player_id == 34102) %>% 
+              dplyr::select(player_id, player_name, batting_style, bowling_style) %>% 
+              drop_na() %>% 
+              distinct()) %>% 
+  dplyr::filter(player_name !="Sultan Ahmed") 
+
+
+bowler_vars <- 
+  player_database %>% 
+  dplyr::select(-c(batting_style, player_name)) %>% 
+  drop_na()%>% 
+  mutate(bowling_style = recode(bowling_style, "Right-arm fast" = "Pace",
+                                "Slow left-arm orthodox"= "Spin",
+                                "Legbreak"= "Spin",
+                                "Right-arm medium"= "Pace",
+                                "Left-arm medium-fast"= "Pace",
+                                "Right-arm offbreak"= "Spin",
+                                "Legbreak googly"= "Spin",
+                                "Left-arm fast"= "Pace",
+                                "Right-arm medium-fast"= "Pace",
+                                "Left-arm fast-medium"= "Pace",
+                                "Right-arm fast-medium"= "Pace",
+                                "Left-arm medium"= "Pace",
+                                "Slow left-arm chinaman"= "Spin",
+                                "Right-arm offbreak, Legbreak"= "Spin",
+                                "Right-arm medium, Right-arm offbreak"= "Spin",
+                                "Left-arm medium, Slow left-arm orthodox, 
+                                               Slow left-arm chinaman"= "Spin", 
+                                "Left-arm medium, Slow left-arm orthodox, Slow left-arm chinaman" = "Spin"))
+
+batting_vars <- 
+  player_database %>% 
+  dplyr::select(-c(bowling_style, player_name)) %>%
+  drop_na() 
+
+cricjam_data <- 
+  read_csv("/Users/James/James/Reproducibility-in-Cricket/Data/combined_2020_09_11.csv") %>% 
+  dplyr::filter(!grepl("No result", match_summary)) %>%
+  mutate(bucketed_year = if_else(nchar(year)==4, year, as.numeric(str_sub(as.character(year), 1, 4)))) %>% 
+  left_join(batting_vars, by = c("batsman_id" = "player_id")) %>% 
+  left_join(bowler_vars, by = c("bowler_id" = "player_id")) %>% 
+  mutate(batsman_name = str_remove(batsman_name, "\\(\\)"), 
+         batsman_name = str_trim(batsman_name), 
+         runs = extra_runs+earned_runs)
+# 
+# cricjam_data_partner <- 
+#   cricjam_data %>% 
+#   dplyr::select(match_id, inning, batsman_name, batsman_id, batting_order) %>% 
+#   distinct() %>% 
+#   arrange(batting_order) %>% View()
+
+wicket_types <-
+  cricjam_data %>% 
+  dplyr::filter(wicket==TRUE) %>% 
+  dplyr::select(wicket_description, play_description, bowler, batsman, bowler_name, batsman_name, 
+                match_id, inning, over) %>%
+  mutate(caught_out = if_else(str_detect(wicket_description, " c "), TRUE, FALSE), 
+         bowled_out = if_else(str_detect(wicket_description, " b "), TRUE, FALSE), 
+         run_out = if_else(str_detect(wicket_description, " run out "), TRUE, FALSE), 
+         stumped_out = if_else(str_detect(wicket_description, " st "), TRUE, FALSE), 
+         leg_before_wicket = if_else(str_detect(wicket_description, " lbw "), TRUE, FALSE), 
+         retired_hurt = if_else(str_detect(wicket_description, " retired hurt "), TRUE, FALSE), 
+         obstructing_the_field = if_else(str_detect(wicket_description, " obstructing the field "), TRUE, FALSE), 
+         retired_out = if_else(str_detect(wicket_description, " retired out "), TRUE, FALSE), 
+         null = if_else(str_detect(wicket_description, " null "), TRUE, FALSE)) %>% 
+  # all_conditions = if_else(caught_out == TRUE |
+  #                          bowled_out == TRUE | caught_out == TRUE |
+  #                            run_out == TRUE |retired_out == TRUE |
+  #                            retired_hurt == TRUE |leg_before_wicket == TRUE |
+  #                            obstructing_the_field == TRUE |null == TRUE |
+  #                            stumped_out == TRUE, TRUE, FALSE))
+  mutate(out_condition = case_when(caught_out==TRUE |
+                                     caught_out==TRUE & bowled_out == TRUE ~ "Caught", 
+                                   run_out == TRUE |
+                                     run_out==TRUE & bowled_out == TRUE ~ "Run Out", 
+                                   stumped_out == TRUE |
+                                     stumped_out==TRUE & bowled_out == TRUE ~ "Stumped", 
+                                   leg_before_wicket == TRUE |
+                                     leg_before_wicket==TRUE & bowled_out == TRUE ~ "Leg Before Wicket", 
+                                   retired_hurt == TRUE |
+                                     retired_hurt==TRUE & bowled_out == TRUE ~ "Retired Hurt", 
+                                   obstructing_the_field == TRUE |
+                                     obstructing_the_field==TRUE & bowled_out == TRUE ~ "Obstructing the Field", 
+                                   retired_out == TRUE |
+                                     retired_out==TRUE & bowled_out == TRUE ~ "Retired Out", 
+                                   null == TRUE |
+                                     null==TRUE & bowled_out == TRUE ~ "Caught", 
+                                   bowled_out == TRUE & caught_out == FALSE |
+                                     bowled_out == TRUE & stumped_out == FALSE |
+                                     bowled_out == TRUE & run_out == FALSE |
+                                     bowled_out == TRUE & leg_before_wicket == FALSE |
+                                     bowled_out == TRUE & retired_hurt == FALSE |
+                                     bowled_out == TRUE & obstructing_the_field == FALSE |
+                                     bowled_out == TRUE & retired_out == FALSE |
+                                     bowled_out == TRUE & null == FALSE ~"Bowled"), 
+         out_batsman = case_when(out_condition == "Bowled" ~ word(wicket_description, 1, sep = " b "), 
+                                 out_condition == "Caught" & null == FALSE ~ word(wicket_description, 1, sep = " c "), 
+                                 out_condition == "Caught" & null == TRUE ~ word(wicket_description, 1, sep = " null "), 
+                                 out_condition == "Run Out" ~ word(wicket_description, 1, sep = " run out "), 
+                                 out_condition == "Stumped" ~ word(wicket_description, 1, sep = " st "), 
+                                 out_condition == "Leg Before Wicket" ~ word(wicket_description, 1, sep = " lbw "), 
+                                 out_condition == "Retired Hurt" ~ word(wicket_description, 1, sep = " retired hurt "), 
+                                 out_condition == "Obstructing the Field" ~ word(wicket_description, 1, sep = " obstructing the field "), 
+                                 out_condition == "Retired Out" ~ word(wicket_description, 1, sep = " retired out ")),  
+         out_batsman = str_trim(out_batsman)) %>% 
+  dplyr::select(-c(caught_out, bowled_out, stumped_out, leg_before_wicket, retired_hurt, 
+                   obstructing_the_field, retired_hurt, null, run_out, retired_out)) %>% 
+  mutate(batsman_or_partner_out = if_else(out_batsman == batsman_name, "Batsman","Partner"))
+
+cricjam_data <- 
+  cricjam_data %>% 
+  left_join(wicket_types, by = c("wicket_description" = "wicket_description", 
+                                 "play_description" = "play_description", 
+                                 "bowler" = "bowler", 
+                                 "batsman" = "batsman", 
+                                 "batsman_name" = "batsman_name", 
+                                 "match_id" = "match_id", 
+                                 "inning" = "inning", 
+                                 "over" = "over", 
+                                 "bowler_name" = "bowler_name")) %>% 
+  rename(inning_summary = inning_total)
+
+
+only_big_t20_matches <- 
+  cricjam_data %>% 
+  dplyr::filter(tournament_type == "Twenty20", 
+                tournament_name %in% c("Twenty20 Big Bash", "Indian Premier League", "Big Bash League", 
+                                       "Champions League Twenty20", "Pepsi Indian Premier League")) %>% 
+  dplyr::select(match_id) %>% 
+  distinct() %>% 
+  pull(match_id) 
+
+cricjam_data_big <- 
+  cricjam_data %>% 
+  dplyr::filter(tournament_type == "Twenty20 Internationals") %>% 
+  bind_rows(cricjam_data %>% 
+              dplyr::filter(match_id %in% only_big_t20_matches))
+```
+
+\color{red}{\text{Yeah I forgot I wouldn't have any internet on the plane, so everything I wrote is not referencing anything from a link or package I didn't have downloaded prior to boarding}}
+
+## Abstract
+
+The importance of reproducibility, and the related issue of open access to data, has received a lot of recent attention. Momentum on these issues is gathering in the sports analytics community, particularly in North America where open access to quality sports data has become the norm. Cricket is the second largest commercial sport in the world, but unlike other popular international sports, there has been no mechanism for the public to access comprehensive statistics on players and teams. Expert commentary currently relies heavily on data that isn't made readily accessible and this produces an unnecessary barrier for the development of an inclusive sports analytics community.
+
+## Introduction
+
+Data access is a key enabler for any analytics community. Most major sports have easy access to match statistics, for example [nbastatR](https://github.com/abresler/nbastatR) for NBA, [Lahman](https://cran.r-project.org/web/packages/Lahman/Lahman.pdf) for baseball, [deuce](https://github.com/skoval/deuce) for tennis and [nflfastR](https://github.com/mrcaseb/nflfastR) for NFL. Through access to sports data and reproducible findings and metrics fans clubs and researchers are better able to understand the game, predict match outcomes and rate players. For example the way teams tackled 4th down decisions in the NFL has changed since [@romer2006firms] seminial work. As teams have changed their 4th down decision making this allows follow up research such as [@yam2019lost] which looked at more granular data to see if this happens in practice.
+
+By making data more accessible and more advanced metrics more accessible fans data journalism in sports has grown in recent years. For example in [@horowitz2017nflscrapr] has enabled EPA to enter popular discussion among fans.
+
+Cricket is the second largest sport in the world. However, unfortunetaly there is no easy accessible way to access ball by ball data nor aggregated statistics of teams and players. Data while available on sites like [espncricinfo](https://www.espncricinfo.com/) are not in an easy to use form. For example, each match is listed on different webpages so hours upon hours of time would be required to copy and paste a single season. Hence, there are significant logistical barriers for prospective fans and analysts studying the game, which stagnats understanding of cricket. The Duckworth-Lewis-Stern table, used to reset targets for matches that experience rain delays in all of cricket, is maintained by one man in Australia. Not even teams have access to the table. \color{red}{text{what do they do, call it into the ICC to get a temporary copy or something when there's a delay?}}
+
+This paper describes the waRne package, the first to provide free and easy access to data for cricket for fans. Web scraping tools are avaiable for fans to easily scrape the play by play commentary data on espncricinfo. For the first time fans can evaluate their favourite teams and players and do so in a reproducible and accessible manner. We have included the data for ODI and T20 from the 2010 archived season on ESPCcricinfo up to the matches on September 8, 2020. If a person wishes to expand this data to include more recent games, this package can scrape and update the dataset.
+
+## Why cricket needs reproducibility
+
+Data accessibility enables fans, analysts and researchers to better understand the game. Through being able to reproduce common popular metrics, visualisations and article findings.
+
+Through being able to reproduce, fans are able to make accessible findings for others and importantly they are able to extend and grow concepts. Unfortuntely what we see through leading cricket analytics providers is a track record of confusing output for fans. This can lead to lower engagement and dismissial of cricket analytics.
+
+\color{red}{\text{I'm not sure if we should slam the datajam competition directly. I think the guy tweeting out conflicting news is a good point and I want to keep that in because he was a dick about his results, but we just lost to Quantium and I worry it will make us seem petty or look like sore losers. We could just indirectly show that they were wrong, but not mention them at all, I would feel fine with that}}
+
+For example in this [series of tweets](https://twitter.com/benjonescricket/status/1219898578719723520) we see the narrative being pushed that Steve Smith is a good player vs pace bowling unfortunetly just a few months prior the same company and journalist published an article which had Steve Smith doing much worse against pace (balls above 140km/h). Unlike a similar sport baseball, fans have no easily accisible way of seeing if Steve Smith vs pace is a strength as alluded to in the original tweet, or a weakness like the same persons published online article. In comparsion, fans are able to get a breakdown of Mike Trout vs fastballs from using [baseballr](https://billpetti.github.io/2018-02-19-build-statcast-database-rstats/) which provides access through statcast data from [baseballsavant]([https://baseballsavant.mlb.com)](https://baseballsavant.mlb.com)). 
+
+Unfortunetly this is just one of many examples whereby a relatively simple statistic is provided by media and fans have no mechanism to fact check. Fact checking is an important avenue for fans to not only engage and understand statistics, but having this mechanism also stops analytics companies from putting out misleading conclusions and findings.
+
+With the commentary data on cricinfo, we are not able to get the same resolution on delivery speed and location as the statcast data provides in baseball, but we can often learn the type of delivery the batsman faces through the years. This represents an enormous leap in publically available data, and we hope will lead to the eventual release of the ball tracking data used butnot shared in crickets leagues around the world 
+
+Armed with this new dataset and the waRne package, we are able to not only compare Steve Smiths performance vs bowling type but we are able to easily compare Steve Smiths performance vs bowling types with other players, across multiple seasons, leagues, and cricket formats.
+
+### Steve Smith vs Bowling Type Chart
+
+James here need to figure out the code, do we keep it seperate so in the example we still have to join on bowling type to the ball by ball, or will it just be an extra column joined already.
+
+\color{red}{\text{So the way the scraper is set up, I grab the play links when scraping the scorecard and commentary along with the id and name, and then run a separate scraper for the batsman/bowler profiles. So they are separate datasets that have to be joined together, and we drop mostly everything except batting and bowling style. I can probably make an all in one scraper, but it'll be a bit tricky and if we want to put this out Friday it might be best to leave them separate and just walk people through it in the readme. Otherwise it might not work at all, and the scraper already breaks down so often you have to pay attention more than you should}}
+
+```{r}
+
+cricjam_data_big %>% 
+	dplyr::filter(batsman_id == 267192, 
+								!is.na(bowling_style)) %>% 
+	group_by(bowling_style, earned_runs) %>% 
+	summarise(total = n()) %>% 
+	group_by(bowling_style) %>% 
+	mutate(totals = sum(total),
+				 percent = total/totals, 
+				 earned_runs = as.factor(earned_runs)) %>% 
+	ggplot(aes(y = bowling_style, x = percent, color = earned_runs))+
+	geom_point() +
+	labs(color = "Runs", 
+			 x = "% Balls Faced", 
+			 y = "Bowling Style", 
+			 title = "Steve Smith's Distribution of Runs Against Spin and Pace")
+
+	
+```
+
+Another reason why is that cricket is a weird sport with a lot of old school rules of thumb that are followed/talked about.
+
+For example it has become popular conjecture that its better that teams should bat second (chase down a total set by the oppoition). Through waRne we can answer such question for the T20 game.
+
+For example we can explore do teams win more often when chasing in the big bash over the history of the big bash, or we can plot a line chart to see if there is a movement towards batting last and winning.
+
+```{r}
+
+cricjam_data_big %>% 
+	dplyr::filter(tournament_name %in% c("Twenty20 Big Bash", "Big Bash League"), 
+								inning == 2) %>% 
+	mutate(year = if_else(nchar(year)==4, year, as.numeric(str_sub(as.character(year), 1, 4)))) %>% 
+	group_by(match_id) %>% 
+	slice(1) %>% 
+	dplyr::select(batting_team_result, year) %>% 
+	mutate(binary_result = if_else(batting_team_result=="win", 1, 0)) %>% 
+	group_by(batting_team_result, year) %>% 
+	summarise(win_count = n()) %>% 
+	ungroup() %>% 
+	pivot_wider(names_from = batting_team_result, values_from = win_count) %>% 
+	rename(superover = 'super-over') %>% 
+	replace_na(list(superover=0)) %>% 
+	mutate(total_games = lose+win+superover, 
+				 win_percentage = win/total_games, 
+				 year = as.factor(year)) %>% 
+	ggplot(aes(x = year, y = win_percentage, group = 1)) +
+	geom_line(color = 'red')
+	
+
+```
+
+## Using waRne to teach undergraduate statistics
+
+We can also use waRne and other R packages as an easy way to engage students in learning statistical concepts.
+
+For example using the above we can not only look at the answers graphically, but we can run a statistical test. The example we would use is instead of testing is a coin biased (different from 50/50) we can test to see if the winning \\% is different from $0.5$ for teams chasing.
+
+```{r}
+
+dat <- 
+	cricjam_data_big %>% 
+	dplyr::filter(tournament_name %in% c("Twenty20 Big Bash", "Big Bash League"), 
+								inning == 2) %>% 
+	mutate(year = if_else(nchar(year)==4, year, as.numeric(str_sub(as.character(year), 1, 4)))) %>% 
+	group_by(match_id) %>% 
+	slice(1) %>% 
+	dplyr::select(batting_team_result, year) %>% 
+	mutate(binary_result = if_else(batting_team_result=="win", 1, 0)) %>% 
+	group_by(batting_team_result) %>% 
+	summarise(win_count = n()) %>% 
+	dplyr::filter(batting_team_result != 'super-over') 
+
+N = sum(dat$win_count)
+wins = dat$win_count[2]
+
+z = (wins/N-0.5)/sqrt((0.5^2)/N)
+
+1-pnorm(abs(z))
+
+# No eveidence to suggest the 2 inning team wins more
+
+```
+
+James and I entered a reproducibility competition and the winning entry provided a statistic sort of a gateway into the importance of their ''project'' was was specifically in 2019 Australian Big Bash T20 season. The statistic given was in the 2019 big bash season teams that batted first won only $43$% of games. Thankfully we can try to reproduce that statistic now through the use of waRne
+
+Wikipedia tells us that there were the following:
+
+In the 2018-19 Big Bash League there were 59 matches played. Of which we had 3 DLS results.
+
+| Games                             | Result                        |
+|-----------------------------------|-------------------------------|
+| 21 DEC 2018 - THUNDER VS STARS    | THUNDER WON BY 15 RUNS (D/L)  |
+| 2 FEB 2019 - THUNDER VS SIXERS    | SIXERS WON BY 9 WICKETS (D/L) |
+| 8 JAN 2019 HEAT VS THUNDER        | HEAT BY 15 RUNS (D/L)         |
+| 17th January 2019 Thunder vs Heat | no result                     |
+
+: Games under consideration in 2018-19 Big Bash
+
+```{r, investigation}
+df<-read.csv("data/combined_2020_09_11.csv")
+
+blah<-df%>%
+	dplyr::select(duckworth_lewis,year,match_id, tournament_name, tournament_type, team, inning, binary_result)%>%
+	dplyr::filter(tournament_type%in% c("Twenty20 Internationals", "Twenty20"  ))%>%
+	dplyr::filter(tournament_name%in% c("Twenty20 Big Bash","Big Bash League" ))%>%
+									dplyr::filter(inning==1)%>%
+									dplyr::group_by()%>%
+									distinct()
+# dataset doesn't contain duckworth lewis results. 
+table(blah$year,blah$binary_result)
+```
+
+\`\`\`
+
+So here we can see that we in the big bash season 2018-19 we have a current winning percentage batting first of 22/(22+33) =0.4 but this doesn't include the duckworth lewis games or the washed out completely game.
+
+If we were to add in the duckworth lewis games we get 24/(24+34) which is equal to 0.414. Which isn't the result.
+
+We can also clearly see that in the 20192020 big bash season the team batting first wins 39/(39+20) or 0.66 so what could be going on? Did Quantium mean only games played in the actual year 2019?
+
+In that case from the 2018-2019 season we would remove the following games
+
+| Date                 | Game                    | Result                   | Winning Team |
+|----------------------|-------------------------|--------------------------|--------------|
+| 19 December 2018     | Heat Vs Strickers       | Strickers 5 Wickets      | Chased       |
+| 20th December 2018   | Scorchers Vs Renegades  | Renegades by 4 wickets   | Chased       |
+| 21 December 2018     | Thunder vs Stars        | Thunder by 15 runs (D/L) | Batted First |
+| 22 December 2018     | Sixers vs Scorchers     | Sixers by 17 runs        | Batted First |
+| 22 December          | Hurricanes vs Heat      | Hurricanes by 15 runs    | Batted First |
+| 23 December 2018     | Strikers vs Renegades   | Renegades by 5 wickets   | Chased       |
+| 24 December 2018     | Stars vs Hurricanes     | Hurricanes by 6 wickets  | Chased       |
+| 24th December 2018   | Thunder vs sixers       | Thunder by 21 runs       | Batted First |
+| 26th December 2018   | Strickers vs scorchers  | Scorchers by 7 wickets   | Chased       |
+| 27th December        | Sixers vs Stars         | stars by 5 wickets       | Chased       |
+| 28th December        | thunder vs hurricanes   | hurricanes by 7 wickets  | Chased       |
+| 29th december        | sixers vs renegades     | sixers by 33 runs        | Batted First |
+| 30th decemeber 2018  | scorchers vs hurricanes | hurricanes by 6 wickets  | Chased       |
+| 31st decemember 2018 | strickers vs thunder    | strickers by 20 runs     | Batted First |
+
+: Games in 2018 of the 2018-19 Big Bash Season
+
+i.e. we remove 14 games here of which 6 teams won batting first 16/(22+33-14)
+
+Then from here we have to add on games in the 2019-2020 big bash season that were played in 2019
+
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| Date               | Teams                   | Result                                | Winning Team             |
++====================+=========================+=======================================+==========================+
+| 17 December        | Thunder vs Heat         | Thunder by 29 runs                    | Batted First             |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| 18th December      | Scorchers vs Sixers     | Sixers by 8 wickets                   | Chased                   |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| 19th december      | Renegades vs thunder    | thunder by 6 wickets                  | chased                   |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| 20th decemeber     | hurricanes vs sixers    | hurricanes by 25 runs                 | batted first             |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| 20th decemember    | stars vs heat           | stars by 22 runs                      | batting first            |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| 21st decemember    | strickers vs thunder    | no result                             | no result                |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| 21st december      | scorchers vs renegades  | scorchers by 11 runs                  | batting first            |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| 22 deceember       | stars vs hurricanes     | stars by 52 runs                      | batting first            |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| 22 decemember      | heat vs sixers          | heat by 48 runs                       | batting first            |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| 23 dec             | strickers vs scorchers  | strickers by 15 (DLS)                 | batting first            |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| 24th dec           | renegades vs hurricanes | hurricanes by 7 wickets               | chased                   |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| 26 decemember      | sixers vs scorchers     | sixers by 48 runs                     | batting first            |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| 27 dec             | strickers vs stars      | strikers by 5 runs                    | batting first            |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| 28th december      | thunder vs sixers       | sixers won super over (batting first) | sixers by superover      |
+|                    |                         |                                       |                          |
+|                    |                         |                                       | or sixers batting second |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| 29th dec           | strikers vs renegades   | strikers by 18 runs                   | batting first            |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| 30th dec           | hurricanes vs stars     | stars by 4 runs (DLS)                 | batting first            |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+| 31st december 2019 | thunder vs strikers     | thunder by 3 runs                     | batting first            |
++--------------------+-------------------------+---------------------------------------+--------------------------+
+
+: Games played in 2019 of the 2019-20 Big Bash
+
+12 batting first and 3 batting second
+
+(16+12)/(12+3+22+33-14)
+
+So over the past 2 years (not including DLS) we have
+
+(22+39)/(20+39+33+22)
+
+i.e. \>50% of teams win chasing so what does that mean?
+
+## Easier engagement of fans
+
+To the surprise of many, its hard to engage cricket fans into the analytics behind the game. Reasons for this are generally centred around reproducibility and explainability to fans.
+
+Without an easy accessible medium how can crickets version of an analytics community grow.
+
+something something look towards how EPA has changed the way fans are engaged in NFL analytics - so maybe the change in run rate can be like EPA?
+
+## Cool cricket examples
+
+-   Dhoni spin/pace/yorkr
+
+    -   shows off joins to player information and extracting information from play by play
+
+-   espncricinfo articles but instead of ipl do same tables for big bash
+
+-   recreate stats from espncricinfo like this [page](https://www.espncricinfo.com/series/19297/statistics/1187665/new-zealand-vs-england-1st-t20i-england-in-new-zealand-2019-20)
+
++------------------------------+--------------------------------------------------------------------------+
+| Things to do                 | person                                                                   |
++==============================+==========================================================================+
+| clean scrapers/csv for waRne | James                                                                    |
++------------------------------+--------------------------------------------------------------------------+
+| data dictionary              | Robert                                                                   |
++------------------------------+--------------------------------------------------------------------------+
+| examples                     | Robert - start (assume same csv being used) - cool cricket example stuff |
++------------------------------+--------------------------------------------------------------------------+
+
+## Dhoni Dilemma
+
+With this new dataset, we allow fans to put on their analyst thats and to be able to ask themselves, what exactly makes a good closer and what exactly is the Dhoni Dilemma.
+
+To understand the Dhoni Deilemma, we need to see some interesting things to do with the change in RRR.
+
+Cricket is an obvious sort of sport, to win in the end you have to get one run more than your opposition. A commonly used statistic during the broadcast is the required run rate, for example if you need 120 to win off 20 overs your RRR is \$6\$ runs an over
+
+What follows is then obvious is the chasing team wins if they are able to lower the RRR that is score quicker.
+
+Espncricinfo did article on teams that win games get a higher proportion of their runs in the powerplay and first 10 overs. But proportion of team runs in T20 games doesn't really make sense as a batting metric as we are not just concerned with how many runs they get, but how quickly they get them. So we introduce a new way to measure batsman change in RRR.
+
+```{r}
+# graph of powerplay
+```
+
+This graph makes sense as we can see the best openers in the world lower the required run rate so whats the Dhoni Dilemma?
+
+```{r}
+# middle overs (enter in the middle)
+```
+
+Dhoni is renowed for being one of the worlds best closers but we can see it seems as though in the middle he is letting the game get out of hand. How can one of the worlds best closers
+
+## notes for James
+
+So I don't think its like a complex paper, because of the way cricket is at the moment I think the biggest influence this stuff can make is
+
+-   being able to fact check
+
+-   having batsman metrics that are beyond average, total runs and SR
+
+-   What we can maybe mention? is that change in RRR while simple seems to be quite effective, a better measurement would be the DLS which we know can be derived from the ball by ball data or alternatively if someone has a resource table they can instead of change in RRR use change in resources or whatever
+
+For the examples, I think its pretty easy to get the graphs to look nice, its more about whats the dataset look like? i.e. do we need the first few lines for reproducibility to be joins or is it sort of like done already
