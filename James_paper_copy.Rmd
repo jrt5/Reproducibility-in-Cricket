@@ -1593,26 +1593,26 @@ cricjam_data_big %>%
 
 ```
 
-We recreated this example from the James-Stein Bookdown to show how cricket is similar to baseball in it's utility for teaching a wide range of statistical concepts. With a new open source data set available, the statistical community and fans have a rich new data set to work with for both teaching and as fans.
+We recreated this example from the James-Stein Bookdown to show how cricket is similar to baseball in it's utility for teaching a wide range of statistical concepts. With a new open source data set available, the statistical community and fans have a rich new data set to work with for any number of personal or professional projects
 
-Take the James-Stein estimator as an example. We choose batsmen who have face d aminimum of 400 balls in the 2019 and 2019/2020 seasons, and using their final strike rate as the "true" strike rate, we estmate at various points in the season what their final strike rate will be. Since T20 cricket is played on the international stage, and at various domestic tournaments which players from around the world are allowed to play in, we will just choose the 10%, 25%, and 50% of their totals balls faced for the season as these estimation points.
+We choose batsmen who have face a minimum of 400 balls in the 2019 and 2019/2020 seasons, and using their final strike rate as the "true" strike rate, we estmate at various points in the season what their final strike rate will be. Since T20 cricket is played on the international stage, and at various domestic tournaments which players from around the world are allowed to play in, we will just choose the 10%, 25%, and 50% of their totals balls faced for the season as these estimation points.
 
 ```{r}
 
 players <-
 	cricjam_data_big %>% 
 	group_by(batsman_id, batsman_name) %>% 
-	# dplyr::filter(year %in% c("2019", "20192020")) %>%
+	dplyr::filter(year %in% c("2019", "20192020")) %>%
 	mutate(balls_faced = n()) %>% 
-	dplyr::filter(balls_faced > 2500) %>% 
-	distinct() %>% 
+	dplyr::filter(balls_faced > 400) %>% 
+	distinct(batsman_id) %>% 
 	# summarise(total = n())
 	pull(batsman_id)
 
 truth <- 
 	cricjam_data_big %>% 
   filter(
-  	# year %in% c("2019", "20192020"), 
+  	year %in% c("2019", "20192020"),
   			 batsman_id %in% players) %>% 
   group_by(batsman_id) %>% 
   summarise(true_sr = 100*sum(extra_runs+earned_runs)/n(), 
@@ -1623,7 +1623,7 @@ set.seed(42)
 obs <- 
 	cricjam_data_big %>% 
   filter(
-  	# year %in% c("2019", "20192020"), 
+  	year %in% c("2019", "20192020"),
   			 batsman_id %in% players) %>% 
   group_by(batsman_id) %>%
   do(sample_frac(., 0.1))  %>%       
@@ -1633,7 +1633,7 @@ obs <-
   inner_join(truth,by="batsman_id") %>% 
 	left_join(cricjam_data_big %>% 
   filter(
-  	# year %in% c("2019", "20192020"), 
+  	year %in% c("2019", "20192020"),
   			 batsman_id %in% players) %>% 
   group_by(batsman_id) %>%
   do(sample_frac(., 0.25))  %>%       
@@ -1642,7 +1642,7 @@ obs <-
   select(batsman_id,mle_25, count_25), by = "batsman_id") %>% 
 	left_join(cricjam_data_big %>% 
   filter(
-  	# year %in% c("2019", "20192020"), 
+  	year %in% c("2019", "20192020"),
   			 batsman_id %in% players) %>% 
   group_by(batsman_id) %>%
   do(sample_frac(., 0.50))  %>%       
@@ -1675,7 +1675,7 @@ obs %>%
   labs(title="The James-Stein Estimator Shrinks the MLE")+
   theme_minimal()
 
-errors <- 
+errors_10 <- 
 	obs %>% 
   mutate(sigma2 = sum((mle_10-p_10_)^2)/count_10,
          JS=p_10_+(1-((N-3)*sigma2/(sum((mle_10-p_10_)^2))))*(mle_10-p_10_)) %>% 
@@ -1686,7 +1686,7 @@ errors <-
 
 # 25%
 count_25 <- obs %>% summarise(median(count_25)) %>% pull()
-	obs %>% 
+obs %>% 
   mutate(sigma2 = sum((mle_25-p_25_)^2)/count_25,
   			 c = (1-((N-3)*sigma2/(sum((mle_25-p_25_)^2)))),
          JS=p_25_+c*(mle_25-p_25_)) %>% 
@@ -1705,7 +1705,7 @@ count_25 <- obs %>% summarise(median(count_25)) %>% pull()
   theme_minimal()
 	
 	
-	errors_25 <- 
+errors_25 <- 
 	obs %>% 
   mutate(sigma2 = sum((mle_25-p_25_)^2)/count_25,
          JS=p_25_+(1-((N-3)*sigma2/(sum((mle_25-p_25_)^2))))*(mle_25-p_25_)) %>% 
@@ -1716,7 +1716,7 @@ count_25 <- obs %>% summarise(median(count_25)) %>% pull()
 	
 	# 50%
 count_50 <- obs %>% summarise(median(count_50)) %>% pull()
-	obs %>% 
+obs %>% 
   mutate(sigma2 = sum((mle_50-p_50_)^2)/count_50,
   			 c = (1-((N-3)*sigma2/(sum((mle_50-p_50_)^2)))),
          JS=p_50_+c*(mle_50-p_50_)) %>% 
@@ -1737,7 +1737,8 @@ count_50 <- obs %>% summarise(median(count_50)) %>% pull()
 	errors_50 <- 
 	obs %>% 
   mutate(sigma2 = sum((mle_50-p_50_)^2)/count_50,
-         JS=p_50_+(1-((N-3)*sigma2/(sum((mle_50-p_50_)^2))))*(mle_50-p_50_)) %>% 
+  			 c = (1-((N-3)*sigma2/(sum((mle_50-p_50_)^2)))),
+         JS=p_50_+c*(mle_50-p_50_)) %>% 
   mutate(mle_pred_error_i = (mle_50-true_sr)^2,
          js_pred_error_i = (JS-true_sr)^2) %>% 
   summarise(js_pred_error = sum(js_pred_error_i),
