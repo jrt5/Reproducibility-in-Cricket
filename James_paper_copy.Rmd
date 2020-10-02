@@ -54,24 +54,24 @@ bowler_vars <-
   player_database %>% 
   dplyr::select(-c(batting_style, player_name)) %>% 
   drop_na()%>% 
-  mutate(pace_spin = bowling_style, "Right-arm fast" = "Pace",
-                                "Slow left-arm orthodox"= "Spin",
-                                "Legbreak"= "Spin",
-                                "Right-arm medium"= "Pace",
-                                "Left-arm medium-fast"= "Pace",
-                                "Right-arm offbreak"= "Spin",
-                                "Legbreak googly"= "Spin",
-                                "Left-arm fast"= "Pace",
-                                "Right-arm medium-fast"= "Pace",
-                                "Left-arm fast-medium"= "Pace",
-                                "Right-arm fast-medium"= "Pace",
-                                "Left-arm medium"= "Pace",
-                                "Slow left-arm chinaman"= "Spin",
-                                "Right-arm offbreak, Legbreak"= "Spin",
-                                "Right-arm medium, Right-arm offbreak"= "Spin",
-                                "Left-arm medium, Slow left-arm orthodox, 
-                                               Slow left-arm chinaman"= "Spin", 
-                                "Left-arm medium, Slow left-arm orthodox, Slow left-arm chinaman" = "Spin")
+  mutate(pace_spin = case_when(bowling_style == "Right-arm fast" ~ "Pace",
+                                bowling_style == "Slow left-arm orthodox"~ "Spin",
+                                bowling_style == "Legbreak"~ "Spin",
+                                bowling_style == "Right-arm medium"~ "Pace",
+                                bowling_style == "Left-arm medium-fast"~ "Pace",
+                                bowling_style == "Right-arm offbreak"~ "Spin",
+                                bowling_style == "Legbreak googly"~"Spin",
+                                bowling_style == "Left-arm fast"~ "Pace",
+                                bowling_style == "Right-arm medium-fast"~ "Pace",
+                                bowling_style == "Left-arm fast-medium"~ "Pace",
+                                bowling_style == "Right-arm fast-medium"~ "Pace",
+                                bowling_style == "Left-arm medium"~ "Pace",
+                                bowling_style == "Slow left-arm chinaman"~ "Spin",
+                                bowling_style == "Right-arm offbreak, Legbreak"~ "Spin",
+                                bowling_style == "Right-arm medium, Right-arm offbreak"~ "Spin",
+                                bowling_style == "Left-arm medium, Slow left-arm orthodox, 
+                                               Slow left-arm chinaman"~ "Spin", 
+                                bowling_style == "Left-arm medium, Slow left-arm orthodox, Slow left-arm chinaman" ~ "Spin"))
 
 batting_vars <- 
   player_database %>% 
@@ -454,7 +454,7 @@ Cricket is an obvious sort of sport, to win in the end you have to get one run m
 
 Espncricinfo did article on teams that win games get a higher proportion of their runs in the powerplay and first 10 overs. But proportion of team runs in T20 games doesn't really make sense as a batting metric as we are not just concerned with how many runs they get, but how quickly they get them. So we introduce a new way to measure batsman change in RRR. 
 
-```{r}
+```{r, message=FALSE, warning=FALSE, echo = FALSE, error=FALSE, results=FALSE}
 # graph of powerplay
 
 opening_batsman_of_interest <- c(
@@ -525,9 +525,6 @@ cricjam_data_big %>%
   labs(x = "Balls Faced", 
        y = "Average Change in Required Run Rate", 
        title = "Top Opening Batsmen T20")
-  theme(axis.text = element_text(size = 12), 
-        axis.title = element_text(size = 16),
-        plot.title = element_text(size = 16))
 
 ```
 
@@ -535,7 +532,7 @@ This graph makes sense as we can see some of the best openers in the world lower
 
 Dhoni is considered the greatest closing batsman in the world. He has pulled of many spectacular saves, and has T20 and T20I strike rates after 14 years in the game. But how does his required run rate compare to other middle order and closing batsman
 
-```{r}
+```{r, message=FALSE, warning=FALSE, echo = FALSE, error=FALSE, results=FALSE}
 # middle overs (enter in the middle)
 
 middle_batsman_of_interest <- c(
@@ -602,9 +599,6 @@ cricjam_data_big %>%
        title = "Top Middle Batsmen T20")+
   geom_text(vjust = 1.4, color = "black") +
   theme_minimal() 
-  theme(axis.text = element_text(size = 12), 
-        axis.title = element_text(size = 16),
-        plot.title = element_text(size = 16)) 
   
 
 ```
@@ -613,15 +607,15 @@ Dhoni is renowed for being one of the worlds best closers but we can see it seem
 
 One possible explanation comes from looking at the acceleration of Dhoni compared to these other middle order batsmen. Dhoni comes in usually around overs 11/12, and from the plot below we can see that he is a slow starter, it takes several overs for him to get his strike rate up, which consistently stays high throughout the game even when other batsmen's begins to drop off.
 
-```{r}
+```{r, message=FALSE, warning=FALSE, echo = FALSE, error=FALSE, results=FALSE}
 
-cricjam_data_big %>%
-	dplyr::filter(batsman_id == 28081, 
-								batsman_balls_faced_this_match == 1) %>%
-	group_by(bucketed_over) %>% 
-	summarise(total = n()) %>% 
-	ungroup() %>% 
-	mutate(mean(total))
+# cricjam_data_big %>%
+# 	dplyr::filter(batsman_id == 28081, 
+# 								batsman_balls_faced_this_match == 1) %>%
+# 	group_by(bucketed_over) %>% 
+# 	summarise(total = n()) %>% 
+# 	ungroup() %>% 
+# 	mutate(mean(total))
 	
 
 cricjam_data_big %>% 
@@ -660,7 +654,7 @@ cricjam_data_big %>%
 
 Another is the effort of Dhoni's partners in moving the game along while Dhoni is up
 
-```{r}
+```{r, message=FALSE, warning=FALSE, echo = FALSE, error=FALSE, results=FALSE}
 
 middle_batsman_of_interest <- c(
   230559, #pollard
@@ -1255,17 +1249,14 @@ pollard %>%
        title = "Change in Required Run Rate While Batting (or Partnering)", 
   		 color = "")+
   facet_wrap(~batsman_name)+
-  theme_minimal()+
-  theme(axis.text = element_text(size = 12), 
-        axis.title = element_text(size = 16),
-        plot.title = element_text(size = 16)) 
+  theme_minimal()
 
 
 ```
 
 
 
-```{r}
+```{r, message=FALSE, warning=FALSE, echo = FALSE, error=FALSE, results=FALSE}
 
 middle_batsman_of_interest <- c(
   230559, #pollard
@@ -1531,16 +1522,82 @@ pollard %>%
        title = "Change in Required Run Rate While Batting (or Partnering)", 
   		 color = "")+
   facet_wrap(~batsman_name)+
-  theme_minimal()+
-  theme(axis.text = element_text(size = 12), 
-        axis.title = element_text(size = 16),
-        plot.title = element_text(size = 16)) 
+  theme_minimal()
 
 
 ```
 
 What we can tell is that in second inning chases, the required run rate for Dhoni is lower than our other top middle order batsmen, contrasting our inital findings. One would assume that this was due to Dhoni's partners, but it appears he still performs at an elite level
 
+
+## RPO
+
+```{r}
+
+rpo_players <- c(
+	# 230559, #pollard
+	# 34102, #rohit sharma
+	33335, #suresh raina
+	28235, #siihkar dhawan
+  # 32498, #yusef pathan
+  # 321777, #david miller
+  # 44936, #AB De Villiers
+  # 276298, #andre russell
+  # 8180, #shane watson
+  34102, #rohit sharma
+  # 51880, #gayle
+  # 325012, #stoinis
+  # 272450, #MR Marsh
+  # 28081, #Dhoni
+  253802, #kholi
+  # 5334, #finch
+  219889 #warner
+  # 326434, #carey
+  # 267192, #smith
+  # 505120, #agar
+  # 530011, #head
+  # 5961, #henriques
+  # 325026 #maxwell
+  # 25913, #nabu
+  # 4864, #christian,
+  # 270484, #faulkner
+  # 230193, #wade
+  # 233680, #wells
+  # 500268, #turner
+  # 334337, #handscomb
+  # 603410, #mcdermott
+  # 308798  #short
+  # 787987, #labuschagne
+  # 1124282, # josh phillipe
+  # 326637, #Chris Lyrnn
+  # 5939, #hussey
+  # 931581 #pant
+  # 308967, # job buttler
+  # 249866  # alex hales
+)
+	
+cricjam_data_big %>% 
+	dplyr::filter(batsman_id %in% rpo_players, 
+								!is.na(pace_spin)) %>% 
+	group_by(pace_spin, batsman_name) %>% 
+	mutate(rpo = sum(runs)/n()*6) %>% 
+	dplyr::summarise(mean_rpo = mean(rpo)) %>% 
+	ggplot(aes(x = mean_rpo, y = batsman_name, color = pace_spin))+
+	geom_point() +
+	theme_minimal()+
+	labs(x = "RPO", 
+			 title = "RPO By Bowling Style", 
+			 y = "", 
+			 color = "")
+
+
+```
+
+```{r}
+
+
+
+```
 
 ## notes for James
 
