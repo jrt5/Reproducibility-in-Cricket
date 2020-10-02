@@ -277,8 +277,9 @@ Alternatively, fans of crickets and teachers of undergraduate statistics might u
 
 dat <- 
 	cricjam_data_big %>% 
-	dplyr::filter(tournament_name %in% c("Twenty20 Big Bash", "Big Bash League"), 
-								inning == 2) %>% 
+	dplyr::filter(
+		# tournament_name %in% c("Twenty20 Big Bash", "Big Bash League"), 
+								inning == 1) %>% 
 	mutate(year = if_else(nchar(year)==4, year, as.numeric(str_sub(as.character(year), 1, 4)))) %>% 
 	group_by(match_id) %>% 
 	slice(1) %>% 
@@ -332,10 +333,66 @@ df %>%
 
 ## James Stein Estimator - Why not a cricket example
 
+Maybe we should just skip this, I'm not confident in what I've done and we could instead just out the yorker in
+
 <https://bookdown.org/content/922/james-stein.html>
 
 ```{r}
 ```
+
+## The Yorker
+
+The yorker is considered the most difficult delivery to hit for a number of reason [Rob can you fill this in]. By pulling the delivery type from the play description on espncricinfo, every time a yorker was bowled we have the players who bowled and batted. We can take a look at the ability to hit yorkers for the closers we compared Dhoni to, and see how they all fare against the most difficult delivery in the game. 
+
+```{r}
+middle_batsman_of_interest <- c(
+  230559, #pollard
+  32498, #yusef pathan
+  321777, #david miller
+  44936, #AB De Villiers
+  276298, #andre russell
+  8180, #shane watson
+  34102, #rohit sharma
+  28081, #Dhoni
+  325026 #maxwell
+  )  
+
+cricjam_data_big %>% 
+  mutate(yorker=if_else(str_detect(play_description,"york"),1,0))%>%
+  select(batsman_id, earned_runs, play_description,yorker, tournament_type, batsman_name)%>%
+  filter(batsman_id%in% middle_batsman_of_interest) %>% 
+  group_by(earned_runs, yorker, batsman_name)%>%
+  tally() %>%
+  filter(yorker==1) %>% 
+  ungroup() %>% 
+	group_by(batsman_name) %>% 
+  mutate(total = sum(n), 
+         percent = n/total, 
+  			 earned_runs = as.factor(earned_runs), 
+  			 yorker_nah = "Yorker") %>% 
+	bind_rows(cricjam_data_big %>% 
+  mutate(yorker=if_else(str_detect(play_description,"york"),1,0))%>%
+  select(batsman_id, earned_runs, play_description,yorker, tournament_type, batsman_name)%>%
+  filter(batsman_id%in% middle_batsman_of_interest) %>% 
+  group_by(earned_runs, yorker, batsman_name)%>%
+  tally() %>%
+  filter(yorker==0) %>% 
+  ungroup() %>% 
+	group_by(batsman_name) %>% 
+  mutate(total = sum(n), 
+         percent = n/total, 
+  			 earned_runs = as.factor(earned_runs), 
+  			 yorker_nah = "Non Yorker")) %>% 
+	ggplot(aes(x = percent, y = batsman_name, color = earned_runs))+
+	geom_point() +
+	labs(color = "Runs", 
+			 y = "", 
+			 x = "%")+
+	facet_wrap(~yorker_nah)
+
+```
+
+Against the yorker most batsmen seem to hit far fewer 6s, though 4s are seemingly unaffected. However this doesn't seem to apply to Dhoni, who appears to be hitting more boundaries when facing the yorkers. Perhaps this is why he is considered the greatest closer of all time. Or perhaps there are other reasons why he appears so much better against the yorker, which this data could help a fan discover.
 
 ## Easier engagement of fans
 
