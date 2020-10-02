@@ -416,11 +416,11 @@ something something look towards how EPA has changed the way fans are engaged in
 
 ## Dhoni Dilemma
 
-With this new dataset, we allow fans to put on their analyst thats and to be able to ask themselves, what exactly makes a good closer and what exactly is the Dhoni Dilemma. To understand the Dhoni Deilemma, we need to see some interesting things to do with the change in RRR.
+With this new dataset, we allow fans to put on their analyst hats and to be able to ask themselves, what exactly makes a good closer and what exactly is the Dhoni Dilemma. To understand the Dhoni Deilemma, we need to see some interesting things to do with the change in required run rate.
 
 Cricket is an obvious sort of sport, to win in the end you have to get one run more than your opposition. A commonly used statistic during the broadcast is the required run rate, for example if you need 120 to win off 20 overs your RRR is \$6\$ runs an over. What follows is then obvious is the chasing team wins if they are able to lower the RRR that is score quicker.
 
-Espncricinfo did article on teams that win games get a higher proportion of their runs in the powerplay and first 10 overs. But proportion of team runs in T20 games doesn't really make sense as a batting metric as we are not just concerned with how many runs they get, but how quickly they get them. So we introduce a new way to measure batsman change in RRR.
+Espncricinfo did article on teams that win games get a higher proportion of their runs in the powerplay and first 10 overs. But proportion of team runs in T20 games doesn't really make sense as a batting metric as we are not just concerned with how many runs they get, but how quickly they get them. So we measure our batsmen's performances by how well they perform when there is a known target, that is in second innings only, and how they affect their teams required run rate while at bat. 
 
 ```{r,message=FALSE, echo=FALSE, warning=FALSE}
 # graph of powerplay
@@ -497,7 +497,7 @@ cricjam_data_big %>%
 
 This graph makes sense as we can see some of the best openers in the world lower the required run rate. So what is the Dhoni Dilemma?
 
-Dhoni is considered the greatest closing batsman in the world. He has pulled of many spectacular saves, and has T20 and T20I strike rates after 14 years in the game. But how does his required run rate compare to other middle order and closing batsman
+Dhoni is considered the greatest closing batsman in the world. He has pulled of many spectacular saves, and has excellent T20 and T20I strike rates after 14 years in the game. But how does his required run rate compare to other middle order and closing batsman. We compare him to some well known middle and closing batsmen from across T20 below. Starting in the middle overs where he plays most often, we compare the required run rates
 
 ```{r,message=FALSE, echo=FALSE, warning=FALSE}
 # middle overs (enter in the middle)
@@ -569,19 +569,11 @@ cricjam_data_big %>%
 
 ```
 
-Dhoni is renowed for being one of the worlds best closers but we can see it seems as though in the middle he is letting the game get out of hand. How can one of the worlds best closers let the run rate go up so consistently in the middle overs?
+It seems as though in the middle he is letting the game get out of hand. How can one of the worlds best closers let the run rate go up so consistently in the middle overs?
 
-One possible explanation comes from looking at the acceleration of Dhoni compared to these other middle order batsmen. Dhoni comes in usually around overs 11/12, and from the plot below we can see that he is a slow starter, it takes several overs for him to get his strike rate up, which consistently stays high throughout the game even when other batsmen's begins to drop off.
+One possible explanation comes from looking at the acceleration of Dhoni compared to these other middle order batsmen. Dhoni comes in usually around overs 11/12, and from the plot below we can see that he is a slow starter, it takes several overs for him to get his strike rate up, which consistently stays high throughout the game even when other batsmen's begins to drop off. It seems he takes a while to warm up, which explains why he comes in early in the second half.
 
 ```{r,message=FALSE, echo=FALSE, warning=FALSE}
-
-cricjam_data_big %>%
-	dplyr::filter(batsman_id == 28081, 
-								batsman_balls_faced_this_match == 1) %>%
-	group_by(bucketed_over) %>% 
-	summarise(total = n()) %>% 
-	ungroup() %>% 
-	mutate(mean(total))
 	
 
 cricjam_data_big %>% 
@@ -614,7 +606,7 @@ cricjam_data_big %>%
 
 ```
 
-Another is the effort of Dhoni's partners in moving the game along while Dhoni is up
+Another we considered is the effort of Dhoni's partner to keep the required run rate down while he's at the crease, but those results couldn't show us that Dhoni is elite in these overs at all
 
 ```{r, message=FALSE,echo=FALSE, warning=FALSE}
 
@@ -882,6 +874,8 @@ pollard %>%
   theme_minimal()
 
 ```
+
+Finally we looked at the performance in the end of the game, overs 17-20. THe required run rate is a poor metric to use here when the resources (overs and wickets) are low, so we restrict this to game situations where the DLS resources are greater than 10. Here we can see that Dhoni is quickly lowering the required run rate, consistently to the end of the match. It appears that this is his strength, being able to at the last minute quickly lower the run near the end of the game in T20
 
 ```{r,message=FALSE,echo=FALSE, warning=FALSE}
 
