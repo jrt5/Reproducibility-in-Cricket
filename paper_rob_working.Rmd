@@ -1,5 +1,5 @@
 ---
-title: "waRne  Putting cricket analytics in a spin"
+title: "waRne - Putting cricket analytics in a spin"
 authors: Robert(1), James (2)
 output:
   pdf_document:
@@ -171,7 +171,7 @@ library(patchwork)
 
 ## Abstract
 
-The importance of reproducibility, and the related issue of open access to data, has received a lot of recent attention.\^[why this not work] Momentum on these issues is gathering in the sports analytics community. While cricket is the second largest commercial sport in the world, unlike other popular international sports, there has been no mechanism for the public to access comprehensive statistics on players and teams. Expert commentary currently relies heavily on data that isn't made readily accessible and this produces an unnecessary barrier for the development of an inclusive sports analytics community.
+The importance of reproducibility, and the related issue of open access to data, has received a lot of recent attention. Momentum on these issues is gathering in the sports analytics community. While cricket is the second largest commercial sport in the world, unlike other popular international sports, there has been no mechanism for the public to access comprehensive statistics on players and teams. Expert commentary currently relies heavily on data that isn't made readily accessible and this produces an unnecessary barrier for the development of an inclusive sports analytics community.
 
 ## Introduction
 
@@ -199,7 +199,7 @@ However though using waRne we are able to not only compare Steve Smiths performa
 
 Fans of cricket and Australian cricket especially might be interested to see if this is a statistical qwerk of small samples or if Steve Smith generally does perform as an elite cricketer vs pace bowling. Teachers of statistics classes might use this as an interesting example to introduce [tidyverse](https://www.tidyverse.org/learn/) principals [@wickham2019welcome].
 
-```{r}
+```{r, echo=FALSE, warning=FALSE}
 library(tidyverse)
 cricjam_data_big %>% 
 	dplyr::filter(batsman_id == 267192, 
@@ -220,10 +220,6 @@ cricjam_data_big %>%
 	
 ```
 
-```{r}
-
-# insert above plots here
-```
 
 ## Using waRne to teach undergraduate statistics
 
@@ -231,15 +227,13 @@ We can also use waRne and other R packages as an easy way to engage students in 
 
 For example using the above we can not only look at the answers graphically, but we can run a statistical test. A common classroom example for learning the binomial distribution is to ask if a coin is based given a proportion of heads and tails given a sample size [@mcelreath2020statistical]. Instead of asking about coins, fans of sport and cricket might be interested to ask the question; after winning the coin toss, should a team decide to bat first or bat second [@kvam2004teaching].
 
-While a coin toss is a seemingly trivial example, like in most professional sports the winner of the coin toss gets to decide what to do. In cricket, the winner of the coin toss gets to decide if they want to bat first and thus set the total that the opposition needs to pass by a single run to win, or if they want to bowl first and thus chase down the total set. Deciding what to do after winning a coin toss has proved to be a popular media piece in recent years\\footnote{<https://www.espncricinfo.com/story/_/id/21489056/stuart-wark-cricket-move-away-coin-toss> }\\footnote{https[://www.espncricinfo.com/video/clip/\_/id/23230682%5D](https://www.espncricinfo.com/video/clip/_/id/23230682%5D){.uri}}
-
-\\footnote{[https://www.espncricinfo.com/story/\_/id/21489056/stuart-wark-cricket-move-away-coin-toss](https://www.espncricinfo.com/story/_/id/21489056/stuart-wark-cricket-move-away-coin-toss?%5D)}
-
-\^[[https://www.espncricinfo.com/story/\_/id/20429499/lehmann-backs-scrapping-toss]](https://www.espncricinfo.com/story/_/id/20429499/lehmann-backs-scrapping-toss%5D) \^[[https://www.espncricinfo.com/story/\_/id/28770755/how-much-does-losing-tosses-impact-visiting-teams]](https://www.espncricinfo.com/story/_/id/28770755/how-much-does-losing-tosses-impact-visiting-teams%5D) \^[<https://www.forbes.com/sites/tristanlavalette/2018/08/20/are-cricket-matches-being-decided-by-the-luck-of-a-coin-toss/#735456837eff>]
-
-\^[<https://www.statsinsider.com.au/bbl/how-important-is-winning-the-toss-in-the-big-bash-league>]
-
-\^[<https://www.espncricinfo.com/story/_/id/18568387/tim-wigmore-how-batting-second-become-more-fruitful-more-popular>]
+While a coin toss is a seemingly trivial example, like in most professional sports the winner of the coin toss gets to decide what to do. In cricket, the winner of the coin toss gets to decide if they want to bat first and thus set the total that the opposition needs to pass by a single run to win, or if they want to bowl first and thus chase down the total set. Deciding what to do after winning a coin toss has proved to be a popular media piece in recent years^[https://www.espncricinfo.com/story/_/id/21489056/stuart-wark-cricket-move-away-coin-toss]
+^[https://www.espncricinfo.com/video/clip/\_/id/23230682%5D(https://www.espncricinfo.com/video/clip/_/id/23230682%5D]
+^[https://www.espncricinfo.com/story/\_/id/21489056/stuart-wark-cricket-move-away-coin-toss](https://www.espncricinfo.com/story/_/id/21489056/stuart-wark-cricket-move-away-coin-toss?%5D]
+^[https://www.espncricinfo.com/story/\_/id/20429499/lehmann-backs-scrapping-toss]](https://www.espncricinfo.com/story/_/id/20429499/lehmann-backs-scrapping-toss%5D] ^[https://www.espncricinfo.com/story/\_/id/28770755/how-much-does-losing-tosses-impact-visiting-teams]
+^[https://www.espncricinfo.com/story/_/id/28770755/how-much-does-losing-tosses-impact-visiting-teams%5D] ^[https://www.forbes.com/sites/tristanlavalette/2018/08/20/are-cricket-matches-being-decided-by-the-luck-of-a-coin-toss/#735456837eff]
+^[https://www.statsinsider.com.au/bbl/how-important-is-winning-the-toss-in-the-big-bash-league]
+^[https://www.espncricinfo.com/story/_/id/18568387/tim-wigmore-how-batting-second-become-more-fruitful-more-popular]
 
 Fans and analysts of the game might want to make this decision based on a simple statistic, for example they might make it based on answer these questions instead.
 
@@ -247,7 +241,7 @@ Fans and analysts of the game might want to make this decision based on a simple
 
 -   Is this consistent across leagues and levels of cricket?
 
-```{r}
+```{r, echo=FALSE, warning=FALSE}
 
 cricjam_data_big %>% 
 	dplyr::filter(tournament_name %in% c("Twenty20 Big Bash", "Big Bash League"), 
@@ -270,9 +264,9 @@ cricjam_data_big %>%
 	geom_line(color = 'red')
 ```
 
-Instead of just looking at this graphically, fans of crickets and teachers of undergraduate statistics might use the dataset as a ''biased coin'' example. So instead of asking, given a proportion of heads over \$n\$ tosses instructors could ask is a team better off batting first or second.
+Instead of just looking at this graphically, fans of crickets and teachers of undergraduate statistics might use the dataset as a ''biased coin'' example. So instead of asking, given a proportion of heads over $n$ tosses instructors could ask is a team better off batting first or second.
 
-```{r}
+```{r, echo=FALSE, warning=FALSE}
 
 n<-900
 p<-0.5
@@ -280,7 +274,7 @@ qbinom(c(0.025,0.975),size=n,prob=p)
 
 ```
 
-```{r}
+```{r, echo=FALSE, warning=FALSE}
 df<-data.frame(
              Year = c(2010L,2011L,2012L,2013L,2014L,
                       2015L,2016L,2017L,2018L,2019L,2020L,2021L,2022L),
@@ -315,8 +309,7 @@ df %>%
 
 <https://bookdown.org/content/922/james-stein.html>
 
-```{r}
-```
+
 
 ## Easier engagement of fans
 
@@ -415,7 +408,7 @@ cricjam_data_big %>%
   geom_text(vjust = 1.4, color = "black") +
   labs(x = "Balls Faced", 
        y = "Average Change in Required Run Rate", 
-       title = "Top Opening Batsmen T20")
+       title = "Top Opening Batsmen T20")+
   theme_minimal()
 ```
 
@@ -498,15 +491,6 @@ Dhoni is renowed for being one of the worlds best closers but we can see it seem
 One possible explanation comes from looking at the acceleration of Dhoni compared to these other middle order batsmen. Dhoni comes in usually around overs 11/12, and from the plot below we can see that he is a slow starter, it takes several overs for him to get his strike rate up, which consistently stays high throughout the game even when other batsmen's begins to drop off.
 
 ```{r,message=FALSE, echo=FALSE, warning=FALSE}
-
-cricjam_data_big %>%
-	dplyr::filter(batsman_id == 28081, 
-								batsman_balls_faced_this_match == 1) %>%
-	group_by(bucketed_over) %>% 
-	summarise(total = n()) %>% 
-	ungroup() %>% 
-	mutate(mean(total))
-	
 
 cricjam_data_big %>% 
     dplyr::filter(batsman_id %in% middle_batsman_of_interest, 
@@ -1078,3 +1062,4 @@ pollard %>%
 ```
 
 What we can tell is that in second inning chases, the required run rate for Dhoni is lower than our other top middle order batsmen, contrasting our inital findings. One would assume that this was due to Dhoni's partners, but it appears he still performs at an elite level
+

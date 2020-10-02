@@ -7,7 +7,6 @@ output:
     toc_float: true
     keep_md: true
 bibliography: references.bib
-
 ---
 
 
@@ -45,6 +44,11 @@ However though using waRne we are able to not only compare Steve Smiths performa
 Fans of cricket and Australian cricket especially might be interested to see if this is a statistical qwerk of small samples or if Steve Smith generally does perform as an elite cricketer vs pace bowling. Teachers of statistics classes might use this as an interesting example to introduce [tidyverse](https://www.tidyverse.org/learn/) principals [@wickham2019welcome].
 
 
+```
+## `summarise()` regrouping output by 'bowling_style' (override with `.groups` argument)
+```
+
+<img src="paper_rob_working-_files/figure-html/unnamed-chunk-1-1.png" width="75%" style="display: block; margin: auto;" />
 
 
 
@@ -56,8 +60,7 @@ For example using the above we can not only look at the answers graphically, but
 
 While a coin toss is a seemingly trivial example, like in most professional sports the winner of the coin toss gets to decide what to do. In cricket, the winner of the coin toss gets to decide if they want to bat first and thus set the total that the opposition needs to pass by a single run to win, or if they want to bowl first and thus chase down the total set. Deciding what to do after winning a coin toss has proved to be a popular media piece in recent years \footnote{https://www.espncricinfo.com/video/clip/\_/id/23230682}
 
-
-(https://www.espncricinfo.com/video/clip/_/id/23230682%5D)} \^[[https://www.espncricinfo.com/story/\_/id/21489056/stuart-wark-cricket-move-away-coin-toss?]](https://www.espncricinfo.com/story/_/id/21489056/stuart-wark-cricket-move-away-coin-toss?%5D) \^[[https://www.espncricinfo.com/story/\_/id/20429499/lehmann-backs-scrapping-toss]](https://www.espncricinfo.com/story/_/id/20429499/lehmann-backs-scrapping-toss%5D) \^[[https://www.espncricinfo.com/story/\_/id/28770755/how-much-does-losing-tosses-impact-visiting-teams]](https://www.espncricinfo.com/story/_/id/28770755/how-much-does-losing-tosses-impact-visiting-teams%5D) \^[<https://www.forbes.com/sites/tristanlavalette/2018/08/20/are-cricket-matches-being-decided-by-the-luck-of-a-coin-toss/#735456837eff>]
+(<https://www.espncricinfo.com/video/clip/_/id/23230682%5D>)} \^[[https://www.espncricinfo.com/story/\_/id/21489056/stuart-wark-cricket-move-away-coin-toss?]](https://www.espncricinfo.com/story/_/id/21489056/stuart-wark-cricket-move-away-coin-toss?%5D) \^[[https://www.espncricinfo.com/story/\_/id/20429499/lehmann-backs-scrapping-toss]](https://www.espncricinfo.com/story/_/id/20429499/lehmann-backs-scrapping-toss%5D) \^[[https://www.espncricinfo.com/story/\_/id/28770755/how-much-does-losing-tosses-impact-visiting-teams]](https://www.espncricinfo.com/story/_/id/28770755/how-much-does-losing-tosses-impact-visiting-teams%5D) \^[<https://www.forbes.com/sites/tristanlavalette/2018/08/20/are-cricket-matches-being-decided-by-the-luck-of-a-coin-toss/#735456837eff>]
 
 \^[<https://www.statsinsider.com.au/bbl/how-important-is-winning-the-toss-in-the-big-bash-league>]
 

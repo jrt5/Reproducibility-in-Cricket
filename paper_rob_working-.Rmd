@@ -1,19 +1,17 @@
 ---
-title: "waRne  Putting cricket analytics in a spin"
+title: "waRne - Putting cricket analytics in a spin"
 authors: Robert(1), James (2)
-output:
+output: 
   pdf_document:
     toc: yes
   html_document:
-    toc: yes
-    toc_float: yes
-    keep_md: yes
-  word_document:
-    toc: yes
+    toc: true
+    toc_float: true
+    keep_md: true
 bibliography: references.bib
 ---
 
-```{r setup, include=FALSE}
+```{r setup,message=FALSE, include=FALSE}
 knitr::opts_chunk$set(message = TRUE, warning = TRUE)
 library(tidyverse)
 player_database <- 
