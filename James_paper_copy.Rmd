@@ -1593,9 +1593,230 @@ cricjam_data_big %>%
 
 ```
 
+We recreated this example from the James-Stein Bookdown to show how cricket is similar to baseball in it's utility for teaching a wide range of statistical concepts. With a new open source data set available, the statistical community and fans have a rich new data set to work with for both teaching and as fans.
+
+Take the James-Stein estimator as an example. We choose batsmen who have face d aminimum of 400 balls in the 2019 and 2019/2020 seasons, and using their final strike rate as the "true" strike rate, we estmate at various points in the season what their final strike rate will be. Since T20 cricket is played on the international stage, and at various domestic tournaments which players from around the world are allowed to play in, we will just choose the 10%, 25%, and 50% of their totals balls faced for the season as these estimation points.
+
 ```{r}
 
+players <-
+	cricjam_data_big %>% 
+	group_by(batsman_id, batsman_name) %>% 
+	# dplyr::filter(year %in% c("2019", "20192020")) %>%
+	mutate(balls_faced = n()) %>% 
+	dplyr::filter(balls_faced > 2500) %>% 
+	distinct() %>% 
+	# summarise(total = n())
+	pull(batsman_id)
 
+truth <- 
+	cricjam_data_big %>% 
+  filter(
+  	# year %in% c("2019", "20192020"), 
+  			 batsman_id %in% players) %>% 
+  group_by(batsman_id) %>% 
+  summarise(true_sr = 100*sum(extra_runs+earned_runs)/n(), 
+              count_full = n()) %>% 
+  select(batsman_id,true_sr, count_full)
+
+set.seed(42)
+obs <- 
+	cricjam_data_big %>% 
+  filter(
+  	# year %in% c("2019", "20192020"), 
+  			 batsman_id %in% players) %>% 
+  group_by(batsman_id) %>%
+  do(sample_frac(., 0.1))  %>%       
+  summarise(mle_10 = 100*sum(extra_runs+earned_runs)/n(), 
+  					count_10 = n()) %>% 
+  select(batsman_id,mle_10, count_10) %>% 
+  inner_join(truth,by="batsman_id") %>% 
+	left_join(cricjam_data_big %>% 
+  filter(
+  	# year %in% c("2019", "20192020"), 
+  			 batsman_id %in% players) %>% 
+  group_by(batsman_id) %>%
+  do(sample_frac(., 0.25))  %>%       
+  summarise(mle_25 = 100*sum(extra_runs+earned_runs)/n(), 
+  					count_25 = n()) %>% 
+  select(batsman_id,mle_25, count_25), by = "batsman_id") %>% 
+	left_join(cricjam_data_big %>% 
+  filter(
+  	# year %in% c("2019", "20192020"), 
+  			 batsman_id %in% players) %>% 
+  group_by(batsman_id) %>%
+  do(sample_frac(., 0.50))  %>%       
+  summarise(mle_50 = 100*sum(extra_runs+earned_runs)/n(), 
+  					count_50 = n()) %>% 
+  select(batsman_id,mle_50, count_50), by = "batsman_id")
+
+p_10_=mean(obs$mle_10)
+p_25_=mean(obs$mle_25)
+p_50_=mean(obs$mle_50)
+N = length(obs$mle_25)
+
+# 10%
+count_10 <- obs %>% summarise(median(count_10)) %>% pull()
+
+obs %>% 
+  mutate(sigma2 = sum((mle_10-p_10_)^2)/count_10,
+         JS=p_10_+(1-((N-3)*sigma2/(sum((mle_10-p_10_)^2))))*(mle_10-p_10_)) %>% 
+  select(-count_10,-sigma2) %>% 
+	dplyr::select(batsman_id, true_sr, mle_10, JS) %>% 
+  gather(type,value,2:4) %>% 
+  mutate(is_truth=+(type=="true_sr")) %>% 
+  mutate(type = factor(type, levels = c("true_sr","JS","mle_10"))) %>%
+  arrange(batsman_id, type) %>% 
+  ggplot(aes(x=value,y=type))+
+  geom_path(aes(group=batsman_id),lty=2,color="lightgrey")+
+  scale_color_manual(values=c("lightgrey", "skyblue"))+ #truth==skyblue
+  geom_point(aes(color=factor(is_truth)))+
+  guides(color=FALSE)+ #remove legend
+  labs(title="The James-Stein Estimator Shrinks the MLE")+
+  theme_minimal()
+
+errors <- 
+	obs %>% 
+  mutate(sigma2 = sum((mle_10-p_10_)^2)/count_10,
+         JS=p_10_+(1-((N-3)*sigma2/(sum((mle_10-p_10_)^2))))*(mle_10-p_10_)) %>% 
+  mutate(mle_pred_error_i = (mle_10-true_sr)^2,
+         js_pred_error_i = (JS-true_sr)^2) %>% 
+  summarise(js_pred_error = sum(js_pred_error_i),
+            mle_pred_error = sum(mle_pred_error_i))
+
+# 25%
+count_25 <- obs %>% summarise(median(count_25)) %>% pull()
+	obs %>% 
+  mutate(sigma2 = sum((mle_25-p_25_)^2)/count_25,
+  			 c = (1-((N-3)*sigma2/(sum((mle_25-p_25_)^2)))),
+         JS=p_25_+c*(mle_25-p_25_)) %>% 
+  # select(-count_25,-sigma2) %>% 
+	dplyr::select(batsman_id, true_sr, mle_25, JS) %>% 
+  gather(type,value,2:4) %>% 
+  mutate(is_truth=+(type=="true_sr")) %>% 
+  mutate(type = factor(type, levels = c("true_sr","JS","mle_25"))) %>%
+  arrange(batsman_id, type) %>% 
+  ggplot(aes(x=value,y=type))+
+  geom_path(aes(group=batsman_id),lty=2,color="lightgrey")+
+  scale_color_manual(values=c("lightgrey", "skyblue"))+ #truth==skyblue
+  geom_point(aes(color=factor(is_truth)))+
+  guides(color=FALSE)+ #remove legend
+  labs(title="The James-Stein Estimator Shrinks the MLE")+
+  theme_minimal()
+	
+	
+	errors_25 <- 
+	obs %>% 
+  mutate(sigma2 = sum((mle_25-p_25_)^2)/count_25,
+         JS=p_25_+(1-((N-3)*sigma2/(sum((mle_25-p_25_)^2))))*(mle_25-p_25_)) %>% 
+  mutate(mle_pred_error_i = (mle_25-true_sr)^2,
+         js_pred_error_i = (JS-true_sr)^2) %>% 
+  summarise(js_pred_error = sum(js_pred_error_i),
+            mle_pred_error = sum(mle_pred_error_i))
+	
+	# 50%
+count_50 <- obs %>% summarise(median(count_50)) %>% pull()
+	obs %>% 
+  mutate(sigma2 = sum((mle_50-p_50_)^2)/count_50,
+  			 c = (1-((N-3)*sigma2/(sum((mle_50-p_50_)^2)))),
+         JS=p_50_+c*(mle_50-p_50_)) %>% 
+  # select(-count_25,-sigma2) %>% 
+	dplyr::select(batsman_id, true_sr, mle_50, JS) %>% 
+  gather(type,value,2:4) %>% 
+  mutate(is_truth=+(type=="true_sr")) %>% 
+  mutate(type = factor(type, levels = c("true_sr","JS","mle_50"))) %>%
+  arrange(batsman_id, type) %>% 
+  ggplot(aes(x=value,y=type))+
+  geom_path(aes(group=batsman_id),lty=2,color="lightgrey")+
+  scale_color_manual(values=c("lightgrey", "skyblue"))+ #truth==skyblue
+  geom_point(aes(color=factor(is_truth)))+
+  guides(color=FALSE)+ #remove legend
+  labs(title="The James-Stein Estimator Shrinks the MLE")+
+  theme_minimal()
+	
+	errors_50 <- 
+	obs %>% 
+  mutate(sigma2 = sum((mle_50-p_50_)^2)/count_50,
+         JS=p_50_+(1-((N-3)*sigma2/(sum((mle_50-p_50_)^2))))*(mle_50-p_50_)) %>% 
+  mutate(mle_pred_error_i = (mle_50-true_sr)^2,
+         js_pred_error_i = (JS-true_sr)^2) %>% 
+  summarise(js_pred_error = sum(js_pred_error_i),
+            mle_pred_error = sum(mle_pred_error_i))
+
+```
+
+```{r}
+
+library(Lahman)
+set.seed(42)
+
+# 1.
+# Select 30 players that don't have missing values
+# and have a good amount of data (total hits > 500)
+players <- Batting %>% 
+  group_by(playerID) %>% 
+  summarise(AB_total = sum(AB), 
+            H_total = sum(H)) %>% 
+  na.omit() %>% 
+  filter(H_total>500) %>%  # collect players with a lot of data
+  sample_n(size=30) %>%    # randomly sample 30 players
+  pull(playerID)
+
+TRUTH <- Batting %>% 
+  filter(playerID %in% players) %>% 
+  group_by(playerID) %>% 
+  summarise(AB_total = sum(AB), 
+            H_total = sum(H)) %>% 
+  mutate(TRUTH = H_total/AB_total) %>% 
+  select(playerID,TRUTH)
+
+set.seed(42)
+obs <- Batting %>% 
+  filter(playerID %in% players) %>% 
+  group_by(playerID) %>%
+  do(sample_n(., 5))  %>%       
+  group_by(playerID) %>% 
+  summarise(AB_total = sum(AB), 
+            H_total = sum(H)) %>% 
+  mutate(MLE = H_total/AB_total) %>% 
+  select(playerID,MLE,AB_total) %>% 
+  inner_join(TRUTH,by="playerID")
+
+p_=mean(obs$MLE)
+N = length(obs$MLE)
+obs %>% summarise(median(AB_total))
+
+sim <- tibble(player = letters, 
+              AB_total=300, 
+              TRUTH = rbeta(100,300,n=26),
+              hits_list = map(.f=rbinom,TRUTH,n=300,size=1)
+)
+bats_sim <- sim %>% 
+  unnest(hits_list) %>% 
+  group_by(player) %>% 
+  summarise(Hits = sum(hits_list)) %>% 
+  inner_join(sim, by = "player") %>% 
+  mutate(MLE = Hits/AB_total) %>% 
+  select(-hits_list)
+bats_sim
+
+bats_sim <- bats_sim %>% 
+  mutate(sigma2 = (p_*(1-p_))/300,
+         JS=p_+(1-((N-3)*sigma2/(sum((MLE-p_)^2))))*(MLE-p_)) %>% 
+  select(-AB_total,-Hits,-sigma2)
+
+bats_sim %>% 
+  gather(type,value,2:4) %>% 
+  mutate(is_truth=+(type=="TRUTH")) %>% 
+  mutate(type = factor(type, levels = c("TRUTH","JS","MLE"))) %>%
+  arrange(player, type) %>% 
+  ggplot(aes(x=value,y=type))+
+  geom_path(aes(group=player),lty=2,color="lightgrey")+
+  scale_color_manual(values=c("lightgrey", "skyblue"))+ #truth==skyblue
+  geom_point(aes(color=factor(is_truth)))+
+  guides(color=FALSE)+ #remove legend
+  labs(title="The James-Stein Estimator Shrinks the MLE")+
+  theme_minimal()
 
 ```
 
