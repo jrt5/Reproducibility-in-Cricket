@@ -3,7 +3,7 @@ title: "waRne - Putting cricket analytics in a spin"
 authors: Robert(1), James (2)
 output:
   pdf_document:
-    toc: yes
+    toc: no
   html_document:
     toc: yes
     toc_float: yes
@@ -21,7 +21,7 @@ player_database <-
   dplyr::select(player_id, player_name, batting_style, bowling_style) %>% 
   dplyr::distinct() %>% 
   dplyr::filter(player_name != "Rohit Gurunath Sharma") %>% 
-  bind_rows(read_csv("data/new_player_database_crickjam (2).csv") %>% 
+  dplyr::bind_rows(read_csv("data/new_player_database_crickjam (2).csv") %>% 
               dplyr::filter(player_id == 34102) %>% 
               dplyr::select(player_id, player_name, batting_style, bowling_style) %>% 
               drop_na() %>% 
@@ -178,7 +178,7 @@ The importance of reproducibility, and the related issue of open access to data,
 
 Data access is a key enabler for any analytics community. Most major sports have easy access to match statistics, for example [nbastatR](https://github.com/abresler/nbastatR) for NBA, [Lahman](https://cran.r-project.org/web/packages/Lahman/Lahman.pdf) for baseball, [deuce](https://github.com/skoval/deuce) for tennis and [nflfastR](https://github.com/mrcaseb/nflfastR) for NFL. Through access to sports data and reproducible findings and metrics fans clubs and researchers are better able to understand the game, predict match outcomes and rate players. For example the way teams tackled 4th down decisions in the NFL has changed since [@romer2006firms] seminial work. As teams have changed their 4th down decision making this allows follow up research such as [@yam2019lost] which looked at more granular data to see if this happens in practice.
 
-By making data more accessible and more advanced metrics more accessible fans data journalism in sports has grown in recent years. For example in [@horowitz2017nflscrapr] has enabled EPA to enter popular discussion among fans
+By making data more accessible more advanced metrics more accessible fans data journalism in sports has grown in recent years. For example in [@horowitz2017nflscrapr] has enabled EPA to enter popular discussion among fans
 ^[https://twitter.com/minakimes/status/1205591497497817089]
 ^[https://twitter.com/KevinColePFF/status/1277974109175951368].
 
@@ -188,9 +188,7 @@ This paper describes the waRne package, the first to provide free and easy acces
 
 ## Why cricket needs reproducibility
 
-Data accessibility enables fans, analysts and researchers to better understand the game. Through being able to reproduce common popular metrics, visualisations and article findings.
-
-Through being able to reproduce, fans are able to make accessible findings for others and importantly they are able to extend and grow concepts. Unfortunately what we see through leading cricket analytics providers is a track record of confusing output for fans. This can lead to lower engagement and dismissal of cricket analytics.
+Data accessibility enables fans, analysts and researchers to better understand the game. Through being able to reproduce, fans are able to make accessible findings for others and importantly they are able to extend and grow concepts. Unfortunately what we see through leading cricket analytics providers is a track record of confusing output for fans. This can lead to lower engagement and dismissal of cricket analytics.
 
 For example in this [series of tweets](https://twitter.com/benjonescricket/status/1219898578719723520) we see the narrative being pushed that Steve Smith is a good player vs pace bowling unfortunately just a few months prior the same company and journalist published an article which had Steve Smith doing much worse against pace (balls above 140km/h). Unlike a similar sport baseball, fans have no easily accessible way of seeing if Steve Smith vs pace is a strength as alluded to in the original tweet, or a weakness like the same persons published online article. In comparison, fans are able to get a breakdown of Mike Trout vs fastballs from using [baseballr](https://billpetti.github.io/2018-02-19-build-statcast-database-rstats/) which provides access through [statcast](http://m.mlb.com/glossary/statcast) data from [baseballsavant](https://baseballsavant.mlb.com/).
 
@@ -204,14 +202,14 @@ Without accessible data and a mechanism to get the data easily into peoples hand
 
 p1<-cricjam_data_big %>% 
 	dplyr::filter(batsman_id == 267192, 
-								!is.na(bowling_style)) %>% 
-	group_by(bowling_style, earned_runs) %>% 
+								!is.na(pace_spin)) %>% 
+	group_by(pace_spin, earned_runs) %>% 
 	summarise(total = n()) %>% 
-	group_by(bowling_style) %>% 
+	group_by(pace_spin) %>% 
 	mutate(totals = sum(total),
 				 percent = total/totals, 
 				 earned_runs = as.factor(earned_runs)) %>% 
-	ggplot(aes(y = bowling_style, x = percent, color = earned_runs))+
+	ggplot(aes(y = pace_spin, x = percent, color = earned_runs))+
 	geom_point() +
 	labs(color = "Runs", 
 			 x = "% Balls Faced", 
@@ -274,7 +272,9 @@ p2<-cricjam_data_big %>%
 			 y = "", 
 			 color = "")
 
-plot_grid(p1,p2, labels=c("",""))
+# plot_grid(p1,p2, labels=c("",""))
+p1
+p2
 
 	
 ```
