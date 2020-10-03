@@ -25,7 +25,7 @@ player_database <-
               dplyr::filter(player_id == 34102) %>% 
               dplyr::select(player_id, player_name, batting_style, bowling_style) %>% 
               drop_na() %>% 
-              distinct()) %>% 
+              dplyr::distinct()) %>% 
   dplyr::filter(player_name !="Sultan Ahmed") 
 
 
@@ -33,7 +33,7 @@ bowler_vars <-
   player_database %>% 
   dplyr::select(-c(batting_style, player_name)) %>% 
   drop_na()%>% 
-  mutate(pace_spin = case_when(bowling_style == "Right-arm fast" ~ "Pace",
+ dplyr:: mutate(pace_spin = case_when(bowling_style == "Right-arm fast" ~ "Pace",
                                 bowling_style == "Slow left-arm orthodox"~ "Spin",
                                 bowling_style == "Legbreak"~ "Spin",
                                 bowling_style == "Right-arm medium"~ "Pace",
@@ -208,7 +208,7 @@ p1<-cricjam_data_big %>%
 			 x = "% Balls Faced", 
 			 y = "Bowling Style", 
 			 title = "Steve Smith's Distribution of Runs Against Spin V Pace")
-p1
+p1 +theme_minimal()
 
 ```
 
@@ -216,7 +216,7 @@ Another barrier for fans to engage in analytics is the inability to look up insi
 ^[https://twitter.com/ChiefsAnalytics/status/1307839100896948230]
 ^[https://twitter.com/benbbaldwin/status/1311344809823657985]. 
 
-Without accessible data and a mechanism to get the data easily into peoples hands, how can cricket experience the growth that the NFL has throughout the past few years^[https://www.samford.edu/sports-analytics/fans/2020/The-Future-of-NFL-Data-Analytics]. Through waRne, we hope to get the ball rolling on changing things for the cricket community. Fans of cricket might be interested to see if their own favourite players perform different against spin vs pace bowling, they might want to explore a different subset of players runs per over. 
+
 
 ```{r, echo=FALSE, message=FALSE,warning=FALSE,out.width = "80%"}
 
@@ -293,12 +293,12 @@ p2<-cricjam_data_big %>%
 			 color = "")
 
 # plot_grid(p1,p2, labels=c("",""))
-p2
+p2 +theme_minimal()
 
 	
 ```
 
-
+Without accessible data and a mechanism to get the data easily into peoples hands, how can cricket experience the growth that the NFL has throughout the past few years^[https://www.samford.edu/sports-analytics/fans/2020/The-Future-of-NFL-Data-Analytics]. Through waRne, we hope to get the ball rolling on changing things for the cricket community. Fans of cricket might be interested to see if their own favourite players perform different against spin vs pace bowling, they might want to explore a different subset of players runs per over. 
 
 ## Using waRne for teaching statistics and [tidyverse](https://www.tidyverse.org/learn/)
 
@@ -316,11 +316,7 @@ While a coin toss is a seemingly trivial example, like in most professional spor
 ^[https://www.statsinsider.com.au/bbl/how-important-is-winning-the-toss-in-the-big-bash-league]
 ^[https://www.espncricinfo.com/story/_/id/18568387/tim-wigmore-how-batting-second-become-more-fruitful-more-popular]
 
-Fans and analysts of the game might want to make this decision based on a simple statistic, for example they might make it based on answer these questions instead.
-
--   Do teams that bat second have a different winning percentage than those who bat first?
-
--   Is this consistent across leagues and levels of cricket?
+Fans of cricket, instead of being mislead by [small samples](https://www.espncricinfo.com/story/_/id/30010174/kkr-vs-rr-ipl-2020-talking-points-why-teams-bowling-first?-did-andre-russell-promotion-work^[This article, has 6 matches being considered overwhelming evidence] might want to instead do a statistical test or visualise if batting first has a difference in terms of winning percentages and is this consistent across leagues.
 
 
 
@@ -365,8 +361,7 @@ cricjam_data_big %>%
 
 ## The Yorker
 
-The yorker is considered the most difficult delivery to hit for a number of reasons . By pulling the delivery type from the play description on espncricinfo, every time a yorker was bowled we have the players who bowled and batted. We can take a look at the ability to hit yorkers for the closers we compared Dhoni to, and see how they all fare against the most difficult delivery in the game. 
-
+The yorker is considered one of most difficult deliveries to hit for batsman for a few reasons. Yorkers are usually bowled quicker than a bowlers average pace and aimed at the batsmans feet. This makes it difficult for the batsman to get ''under'' the ball and hit it over the fence for six. By pulling the delivery type from the play description on espncricinfo, every time a yorker was bowled we have the players who bowled and batted. As yorkers are typically bowled during the closing stages of matches, we can look at how good closers such as [Dhoni](https://www.espncricinfo.com/india/content/player/28081.html) bat against them.
 ```{r, echo=FALSE, message=FALSE, warning=FALSE,out.width = "80%"}
 middle_batsman_of_interest <- c(
   230559, #pollard
@@ -410,19 +405,19 @@ cricjam_data_big %>%
 	geom_point() +
 	labs(color = "Runs", 
 			 y = "", 
-			 x = "%")+
+			 x = "%")+ theme_minimal()+
 	facet_wrap(~yorker_nah)
 
 ```
 
 
-## Dhoni Dilemma
+## [Dhoni](https://www.espncricinfo.com/india/content/player/28081.html) Dilemma
 
-With this new dataset, we allow fans to put on their analyst hats and to be able to ask themselves, what exactly makes a good closer and what exactly is the Dhoni Dilemma. To understand the Dhoni Deilemma, we need to see some interesting things to do with the change in required run rate.
+With access to espncricinfo data, we allow fans to put on their analyst hats and to be able to ask themselves, what exactly makes a good closer and what exactly is the Dhoni Dilemma. 
 
-Cricket is an obvious sort of sport, to win in the end you have to get one run more than your opposition. A commonly used statistic during the broadcast is the required run rate, for example if you need 120 to win off 20 overs your RRR is \$6\$ runs an over. What follows is then obvious is the chasing team wins if they are able to lower the RRR that is score quicker.
+Cricket is an obvious sort of sport, to win in the end you have to get one run more than your opposition. A commonly used statistic during the broadcast is the required run rate, for example if you need 120 to win off 20 overs your RRR is $6$ runs an over. What follows is then obvious, the chasing team wins if they are able to lower the RRR to 0.
 
-Espncricinfo did article on teams that win games get a higher proportion of their runs in the powerplay and first 10 overs. But proportion of team runs in T20 games doesn't really make sense as a batting metric as we are not just concerned with how many runs they get, but how quickly they get them. So we measure our batsmen's performances by how well they perform when there is a known target, that is in second innings only, and how they affect their teams required run rate while at bat. 
+Espncricinfo did a piece on successful T20 chases and found that teams who score a higher proportion of their needed runs in the first 10 overs did better than those who did not^[https://www.espncricinfo.com/story/_/id/26712889/t20-chases-won-lost-first-ten-overs-not-last-ten]. But proportion of team runs in T20 games doesn't really make sense as an individual batting metric as we are not just concerned with how many runs they get, but how quickly they get them. So we measure our batsmen's performances by how well they perform when there is a known target, that is in second innings only, and how they affect their teams required run rate while at bat. 
 
 ```{r,message=FALSE, echo=FALSE, warning=FALSE,out.width = "80%"}
 # graph of powerplay
@@ -493,13 +488,13 @@ cricjam_data_big %>%
   geom_text(vjust = 1.4, color = "black") +
   labs(x = "Balls Faced", 
        y = "Average Change in Required Run Rate", 
-       title = "Top Opening Batsmen T20")+
+       title = "Top Opening Batsmen T20 (Overs 1-6)")+
   theme_minimal()
 ```
 
-This graph makes sense as we can see some of the best openers in the world lower the required run rate. So what is the Dhoni Dilemma?
+This graph makes sense as we can see some of the best openers in the world lower the required run rate^[https://www.icc-cricket.com/rankings/mens/player-rankings/t20i]. So what is the Dhoni Dilemma?
 
-Dhoni is considered the greatest closing batsman in the world. He has pulled of many spectacular saves, and has excellent T20 and T20I strike rates after 14 years in the game. But how does his required run rate compare to other middle order and closing batsman. We compare him to some well known middle and closing batsmen from across T20 below. Starting in the middle overs where he plays most often, we compare the required run rates
+Dhoni is considered the greatest closing batsman in the world^[https://www.smh.com.au/sport/cricket/australia-to-stick-with-stoinis-in-hope-he-can-be-their-dhoni-20200905-p55sqn.html]. He has pulled of many spectacular wins, and has excellent T20 and T20I strike rates after 14 years in the game. But how does his required run rate compare to other middle order and closing batsman. We compare him to some well known middle and closing batsmen from across T20 below. Starting in the middle overs where he plays most often, we compare the required run rates
 
 ```{r,message=FALSE, echo=FALSE, warning=FALSE,out.width = "80%"}
 # middle overs (enter in the middle)
@@ -565,7 +560,7 @@ cricjam_data_big %>%
   # geom_text(vjust = 1, color = "black") +
   labs(x = "Balls Faced", 
        y = "Average Change in Required Run Rate", 
-       title = "Top Middle Batsmen T20")+
+       title = "Top Middle Batsmen T20 overs 7-16")+
   geom_text(vjust = 1.4, color = "black") +
   theme_minimal() 
 
@@ -607,7 +602,7 @@ cricjam_data_big %>%
 
 ```
 
-Another we considered is the effort of Dhoni's partner to keep the required run rate down while he's at the crease, but those results couldn't show us that Dhoni is elite in these overs at all
+A common theory would be that if Dhoni is lowering the required run rate himself, then during this phase of play it must be his partner who is attacking the run rate, while Dhoni aims to survive to the closing overs. However looking at Dhonis partners we see this is not the case. Thus adding to the Dhoni Dilemma.
 
 ```{r, message=FALSE,echo=FALSE, warning=FALSE,out.width = "80%"}
 
@@ -875,6 +870,10 @@ pollard %>%
   theme_minimal()
 
 ```
+
+
+Finally we looked at the performance in the end of the game, overs 17-20. The required run rate is a poor metric to use here when the resources (overs and wickets) are low, so we restrict this to game situations where the [DLS](https://en.wikipedia.org/wiki/Duckworth%E2%80%93Lewis%E2%80%93Stern_method)^[The Duckworth Lewis tables are not publically accessible, through this example we hope someone somewhere will upload the tables for T20, for this example we had to use the ODI ones] resources are greater than 10. Here we can see that Dhoni is quickly lowering the required run rate, consistently to the end of the match. It appears that this is his strength, being able to at the last minute quickly lower the run near the end of the game in T20
+
 
 ```{r,message=FALSE,echo=FALSE, warning=FALSE,out.width = "80%"}
 
@@ -1146,9 +1145,10 @@ pollard %>%
 
 ```
 
-Finally we looked at the performance in the end of the game, overs 17-20. THe required run rate is a poor metric to use here when the resources (overs and wickets) are low, so we restrict this to game situations where the DLS resources are greater than 10. Here we can see that Dhoni is quickly lowering the required run rate, consistently to the end of the match. It appears that this is his strength, being able to at the last minute quickly lower the run near the end of the game in T20
 
-What we can tell is that in second inning chases, the required run rate for Dhoni is lower than our other top middle order batsmen, contrasting our inital findings. One would assume that this was due to Dhoni's partners, but it appears he still performs at an elite level
+
+It is clear in the data that while Dhoni is considered by many to be the worlds best closer, he is doing it in a unique counter intuitive way. While many would consider lowering the required run rate to be a priority, Dhoni and his partners consistently allow the required run rate to increase, however Dhoni is able to still bring his team home. This creates a dilemma for coaches, analysts and fans. Can their favourite player be a good closer if they try to bat like Dhoni? 
+
 
 
 
@@ -1160,6 +1160,6 @@ To the surprise of many, there has not been a real push to engage fans in the an
 
 Without an easy accessible medium how can crickets version of an analytics community grow.
 
-We believe that access to the play-by-play data available to cricket analysts and teams is vital to create a strong cricket analytics community. Without access fans are forced to accept the statistics given by analytics teams like Cricviz, who have released contradictory statistics on players to a community without the acesss to verify the work. The waRne package is at the moment a tool for scraping games that are complete, and lacks the functionality to live scrape and update. However we believe this framework can be adapted for live scraping as well, to give fans the ultimate tools for engaging in the game of cricket.
+We believe that access to the play-by-play data available to cricket analysts and teams is vital to create a strong cricket analytics community. Without access fans are forced to accept the statistics given by analytics teams like Cricviz, who have released contradictory statistics on players to a community without the access to verify the work. The waRne package is at the moment a tool for scraping games that are complete, and lacks the functionality to live scrape and update. However we believe this framework can be adapted for live scraping as well, to give fans the ultimate tools for engaging in the game of cricket.
 
 \newpage
