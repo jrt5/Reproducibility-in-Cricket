@@ -366,11 +366,57 @@ df %>%
 
 ```
 
-## James Stein Estimator - Why not a cricket example
+## The Yorker
 
-<https://bookdown.org/content/922/james-stein.html>
+The yorker is considered the most difficult delivery to hit for a number of reason [Rob can you fill this in]. By pulling the delivery type from the play description on espncricinfo, every time a yorker was bowled we have the players who bowled and batted. We can take a look at the ability to hit yorkers for the closers we compared Dhoni to, and see how they all fare against the most difficult delivery in the game. 
 
+```{r}
+middle_batsman_of_interest <- c(
+  230559, #pollard
+  32498, #yusef pathan
+  321777, #david miller
+  44936, #AB De Villiers
+  276298, #andre russell
+  8180, #shane watson
+  34102, #rohit sharma
+  28081, #Dhoni
+  325026 #maxwell
+  )  
 
+cricjam_data_big %>% 
+  mutate(yorker=if_else(str_detect(play_description,"york"),1,0))%>%
+  select(batsman_id, earned_runs, play_description,yorker, tournament_type, batsman_name)%>%
+  filter(batsman_id%in% middle_batsman_of_interest) %>% 
+  group_by(earned_runs, yorker, batsman_name)%>%
+  tally() %>%
+  filter(yorker==1) %>% 
+  ungroup() %>% 
+	group_by(batsman_name) %>% 
+  mutate(total = sum(n), 
+         percent = n/total, 
+  			 earned_runs = as.factor(earned_runs), 
+  			 yorker_nah = "Yorker") %>% 
+	bind_rows(cricjam_data_big %>% 
+  mutate(yorker=if_else(str_detect(play_description,"york"),1,0))%>%
+  select(batsman_id, earned_runs, play_description,yorker, tournament_type, batsman_name)%>%
+  filter(batsman_id%in% middle_batsman_of_interest) %>% 
+  group_by(earned_runs, yorker, batsman_name)%>%
+  tally() %>%
+  filter(yorker==0) %>% 
+  ungroup() %>% 
+	group_by(batsman_name) %>% 
+  mutate(total = sum(n), 
+         percent = n/total, 
+  			 earned_runs = as.factor(earned_runs), 
+  			 yorker_nah = "Non Yorker")) %>% 
+	ggplot(aes(x = percent, y = batsman_name, color = earned_runs))+
+	geom_point() +
+	labs(color = "Runs", 
+			 y = "", 
+			 x = "%")+
+	facet_wrap(~yorker_nah)
+
+```
 
 ## Easier engagement of fans
 
@@ -381,16 +427,6 @@ Without an easy accessible medium how can crickets version of an analytics commu
 something something look towards how EPA has changed the way fans are engaged in NFL analytics - so maybe the change in run rate can be like EPA?
 
 <https://twitter.com/cricvizanalyst/status/1311260989267087361>
-
-## Cool cricket examples
-
--   Dhoni spin/pace/yorkr
-
-    -   shows off joins to player information and extracting information from play by play
-
--   espncricinfo articles but instead of ipl do same tables for big bash
-
--   recreate stats from espncricinfo like this [page](https://www.espncricinfo.com/series/19297/statistics/1187665/new-zealand-vs-england-1st-t20i-england-in-new-zealand-2019-20)
 
 ## Dhoni Dilemma
 
