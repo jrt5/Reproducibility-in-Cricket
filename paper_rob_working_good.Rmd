@@ -1,6 +1,6 @@
 ---
 title: "waRne - Putting cricket analytics in a spin"
-authors: Robert(1), James (2)
+authors: "unknown 1", "unknown 2"
 output:
   pdf_document:
     toc: no
@@ -178,7 +178,7 @@ The importance of reproducibility, and the related issue of open access to data,
 
 Data access is a key enabler for any analytics community. Most major sports have easy access to match statistics, for example [nbastatR](https://github.com/abresler/nbastatR) for NBA, [Lahman](https://cran.r-project.org/web/packages/Lahman/Lahman.pdf) for baseball, [deuce](https://github.com/skoval/deuce) for tennis and [nflfastR](https://github.com/mrcaseb/nflfastR) for NFL. Through access to sports data and reproducible findings and metrics fans clubs and researchers are better able to understand the game, predict match outcomes and rate players. For example the way teams tackled 4th down decisions in the NFL has changed since [@romer2006firms] seminial work. As teams have changed their 4th down decision making this allows follow up research such as [@yam2019lost] which looked at more granular data to see if this happens in practice.
 
-By making data more accessible more advanced metrics more accessible fans data journalism in sports has grown in recent years. For example in [@horowitz2017nflscrapr] has enabled EPA to enter popular discussion among fans
+By making data available more advanced metrics have become more accessible to  fans through quality data journalists. For example in [@horowitz2017nflscrapr] has enabled EPA to enter popular discussion among fans
 ^[https://twitter.com/minakimes/status/1205591497497817089]
 ^[https://twitter.com/KevinColePFF/status/1277974109175951368].
 
@@ -192,7 +192,7 @@ Data accessibility enables fans, analysts and researchers to better understand t
 
 For example in this [series of tweets](https://twitter.com/benjonescricket/status/1219898578719723520) we see the narrative being pushed that Steve Smith is a good player vs pace bowling unfortunately just a few months prior the same company and journalist published an article which had Steve Smith doing much worse against pace (balls above 140km/h). Unlike a similar sport baseball, fans have no easily accessible way of seeing if Steve Smith vs pace is a strength as alluded to in the original tweet, or a weakness like the same persons published online article. In comparison, fans are able to get a breakdown of Mike Trout vs fastballs from using [baseballr](https://billpetti.github.io/2018-02-19-build-statcast-database-rstats/) which provides access through [statcast](http://m.mlb.com/glossary/statcast) data from [baseballsavant](https://baseballsavant.mlb.com/).
 
-```{r, echo=FALSE, warning=FALSE,message=FALSE,out.width = "80%"}
+```{r, echo=FALSE, warning=FALSE,message=FALSE,out.width = "80%",fig.align='center'}
 p1<-cricjam_data_big %>% 
 	dplyr::filter(batsman_id == 267192, 
 								!is.na(pace_spin)) %>% 
@@ -218,7 +218,7 @@ Another barrier for fans to engage in analytics is the inability to look up insi
 
 
 
-```{r, echo=FALSE, message=FALSE,warning=FALSE,out.width = "80%"}
+```{r, echo=FALSE, message=FALSE,warning=FALSE,out.width = "80%",fig.align='center'}
 
 p1<-cricjam_data_big %>% 
 	dplyr::filter(batsman_id == 267192, 
@@ -316,13 +316,13 @@ While a coin toss is a seemingly trivial example, like in most professional spor
 ^[https://www.statsinsider.com.au/bbl/how-important-is-winning-the-toss-in-the-big-bash-league]
 ^[https://www.espncricinfo.com/story/_/id/18568387/tim-wigmore-how-batting-second-become-more-fruitful-more-popular]
 
-Fans of cricket, instead of being mislead by [small samples](https://www.espncricinfo.com/story/_/id/30010174/kkr-vs-rr-ipl-2020-talking-points-why-teams-bowling-first?-did-andre-russell-promotion-work^[This article, has 6 matches being considered overwhelming evidence] might want to instead do a statistical test or visualise if batting first has a difference in terms of winning percentages and is this consistent across leagues.
+Fans of cricket, instead of being mislead by [small samples](https://www.espncricinfo.com/story/_/id/30010174/kkr-vs-rr-ipl-2020-talking-points-why-teams-bowling-first?-did-andre-russell-promotion-work)^[This article, has 6 matches being considered overwhelming evidence] might want to instead do a statistical test or visualise if batting first has a difference in terms of winning percentages and is this consistent across leagues.
 
 
 
 
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE,out.width = "80%"}
+```{r, echo=FALSE, warning=FALSE, message=FALSE,out.width = "80%",fig.align='center'}
 library(broom)
 cricjam_data_big %>% 
 	dplyr::filter(inning == 1, 
@@ -352,7 +352,7 @@ cricjam_data_big %>%
   ggplot(aes(factor(year), p.value)) + 
     geom_errorbar(aes(ymin=conf.low, ymax=conf.high, color = (p.value > 0.05)), width=.1) +
   theme_minimal() +
-  labs(y = "P(Batting is fair)", x = "Year", color = "p > 0.05") +
+  labs(y = "P(Batting is fair)", x = "Year", color = "p < 0.05") +
   ggtitle("Annual 1st Inning Batting Fairness")+ 
   theme(axis.text.x=element_text(angle=-90))+
 	facet_wrap(~t_name)
@@ -362,7 +362,8 @@ cricjam_data_big %>%
 ## The Yorker
 
 The yorker is considered one of most difficult deliveries to hit for batsman for a few reasons. Yorkers are usually bowled quicker than a bowlers average pace and aimed at the batsmans feet. This makes it difficult for the batsman to get ''under'' the ball and hit it over the fence for six. By pulling the delivery type from the play description on espncricinfo, every time a yorker was bowled we have the players who bowled and batted. As yorkers are typically bowled during the closing stages of matches, we can look at how good closers such as [Dhoni](https://www.espncricinfo.com/india/content/player/28081.html) bat against them.
-```{r, echo=FALSE, message=FALSE, warning=FALSE,out.width = "80%"}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE,out.width = "80%",fig.align='center'}
 middle_batsman_of_interest <- c(
   230559, #pollard
   32498, #yusef pathan
@@ -415,11 +416,11 @@ cricjam_data_big %>%
 
 With access to espncricinfo data, we allow fans to put on their analyst hats and to be able to ask themselves, what exactly makes a good closer and what exactly is the Dhoni Dilemma. 
 
-Cricket is an obvious sort of sport, to win in the end you have to get one run more than your opposition. A commonly used statistic during the broadcast is the required run rate, for example if you need 120 to win off 20 overs your RRR is $6$ runs an over. What follows is then obvious, the chasing team wins if they are able to lower the RRR to 0.
+Cricket is an obvious sort of sport, to win in the end you have to get one run more than your opposition. A commonly used statistic during the broadcast is the required run rate (RRR), for example if you need 120 to win off 20 overs your RRR is $6$ runs an over. What follows is then obvious, the chasing team wins if they are able to lower the RRR to 0.
 
 Espncricinfo did a piece on successful T20 chases and found that teams who score a higher proportion of their needed runs in the first 10 overs did better than those who did not^[https://www.espncricinfo.com/story/_/id/26712889/t20-chases-won-lost-first-ten-overs-not-last-ten]. But proportion of team runs in T20 games doesn't really make sense as an individual batting metric as we are not just concerned with how many runs they get, but how quickly they get them. So we measure our batsmen's performances by how well they perform when there is a known target, that is in second innings only, and how they affect their teams required run rate while at bat. 
 
-```{r,message=FALSE, echo=FALSE, warning=FALSE,out.width = "80%"}
+```{r,message=FALSE, echo=FALSE, warning=FALSE,out.width = "80%",fig.align='center'}
 # graph of powerplay
 
 opening_batsman_of_interest <- c(
@@ -496,7 +497,7 @@ This graph makes sense as we can see some of the best openers in the world lower
 
 Dhoni is considered the greatest closing batsman in the world^[https://www.smh.com.au/sport/cricket/australia-to-stick-with-stoinis-in-hope-he-can-be-their-dhoni-20200905-p55sqn.html]. He has pulled of many spectacular wins, and has excellent T20 and T20I strike rates after 14 years in the game. But how does his required run rate compare to other middle order and closing batsman. We compare him to some well known middle and closing batsmen from across T20 below. Starting in the middle overs where he plays most often, we compare the required run rates
 
-```{r,message=FALSE, echo=FALSE, warning=FALSE,out.width = "80%"}
+```{r,message=FALSE, echo=FALSE, warning=FALSE,out.width = "80%",fig.align='center'}
 # middle overs (enter in the middle)
 
 middle_batsman_of_interest <- c(
@@ -566,11 +567,11 @@ cricjam_data_big %>%
 
 ```
 
-It seems as though in the middle he is letting the game get out of hand. How can one of the worlds best closers let the run rate go up so consistently in the middle overs?
+It seems as though in the middle he is letting the game get out of hand. How can one of the worlds best closers let the required run rate go up so consistently in the middle overs?
 
 One possible explanation comes from looking at the acceleration of Dhoni compared to these other middle order batsmen. Dhoni comes in usually around overs 11/12, and from the plot below we can see that he is a slow starter, it takes several overs for him to get his strike rate up, which consistently stays high throughout the game even when other batsmen's begins to drop off. It seems he takes a while to warm up, which explains why he comes in early in the second half.
 
-```{r,message=FALSE, echo=FALSE, warning=FALSE,out.width = "80%"}
+```{r,message=FALSE, echo=FALSE, warning=FALSE,out.width = "80%",fig.align='center'}
 
 cricjam_data_big %>% 
     dplyr::filter(batsman_id %in% middle_batsman_of_interest, 
@@ -604,7 +605,7 @@ cricjam_data_big %>%
 
 A common theory would be that if Dhoni is lowering the required run rate himself, then during this phase of play it must be his partner who is attacking the run rate, while Dhoni aims to survive to the closing overs. However looking at Dhonis partners we see this is not the case. Thus adding to the Dhoni Dilemma.
 
-```{r, message=FALSE,echo=FALSE, warning=FALSE,out.width = "80%"}
+```{r, message=FALSE,echo=FALSE, warning=FALSE,out.width = "80%",fig.align='center'}
 
 middle_batsman_of_interest <- c(
   230559, #pollard
@@ -872,10 +873,10 @@ pollard %>%
 ```
 
 
-Finally we looked at the performance in the end of the game, overs 17-20. The required run rate is a poor metric to use here when the resources (overs and wickets) are low, so we restrict this to game situations where the [DLS](https://en.wikipedia.org/wiki/Duckworth%E2%80%93Lewis%E2%80%93Stern_method)^[The Duckworth Lewis tables are not publically accessible, through this example we hope someone somewhere will upload the tables for T20, for this example we had to use the ODI ones] resources are greater than 10. Here we can see that Dhoni is quickly lowering the required run rate, consistently to the end of the match. It appears that this is his strength, being able to at the last minute quickly lower the run near the end of the game in T20
+Finally we looked at the performance in the end of the game, overs 17-20. The required run rate is a poor metric to use here when the resources (overs and wickets) are low, so we restrict this to game situations where the [DLS](https://en.wikipedia.org/wiki/Duckworth%E2%80%93Lewis%E2%80%93Stern_method)^[The Duckworth Lewis tables are not publically accessible, through this example we hope someone somewhere will upload the tables for T20, for this example we had to use the ODI ones] resources are greater than 10. Here we can see that Dhoni is quickly lowering the required run rate, consistently to the end of the match. It appears that this is his strength, being able to at the last minute quickly lower the required run rate near the end of the game in T20
 
 
-```{r,message=FALSE,echo=FALSE, warning=FALSE,out.width = "80%"}
+```{r,message=FALSE,echo=FALSE, warning=FALSE,out.width = "80%",fig.align='center'}
 
 middle_batsman_of_interest <- c(
   230559, #pollard
