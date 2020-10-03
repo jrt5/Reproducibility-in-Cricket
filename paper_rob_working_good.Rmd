@@ -192,6 +192,26 @@ Data accessibility enables fans, analysts and researchers to better understand t
 
 For example in this [series of tweets](https://twitter.com/benjonescricket/status/1219898578719723520) we see the narrative being pushed that Steve Smith is a good player vs pace bowling unfortunately just a few months prior the same company and journalist published an article which had Steve Smith doing much worse against pace (balls above 140km/h). Unlike a similar sport baseball, fans have no easily accessible way of seeing if Steve Smith vs pace is a strength as alluded to in the original tweet, or a weakness like the same persons published online article. In comparison, fans are able to get a breakdown of Mike Trout vs fastballs from using [baseballr](https://billpetti.github.io/2018-02-19-build-statcast-database-rstats/) which provides access through [statcast](http://m.mlb.com/glossary/statcast) data from [baseballsavant](https://baseballsavant.mlb.com/).
 
+```{r, echo=FALSE, warning=FALSE,message=FALSE,out.width = "80%"}
+p1<-cricjam_data_big %>% 
+	dplyr::filter(batsman_id == 267192, 
+								!is.na(pace_spin)) %>% 
+	group_by(pace_spin, earned_runs) %>% 
+	summarise(total = n()) %>% 
+	group_by(pace_spin) %>% 
+	mutate(totals = sum(total),
+				 percent = total/totals, 
+				 earned_runs = as.factor(earned_runs)) %>% 
+	ggplot(aes(y = pace_spin, x = percent, color = earned_runs))+
+	geom_point() +
+	labs(color = "Runs", 
+			 x = "% Balls Faced", 
+			 y = "Bowling Style", 
+			 title = "Steve Smith's Distribution of Runs Against Spin V Pace")
+p1
+
+```
+
 Another barrier for fans to engage in analytics is the inability to look up insights around their favourite players, for cricket many fans have to take insights as standalone facts, without the ability to explore other players who might be of interest. For example after seeing this [tweet](https://twitter.com/cricvizanalyst/status/1311260989267087361) fans might want to know how their favourite player goes against various types of bowling. This is in stark contrast to other major sports like the NFL whereby some of the leading analytical writers make their insights more accessible by sharing code^[https://www.opensourcefootball.com/posts/2020-09-09-creating-an-expected-field-goal-metric/] and data sources.^[https://twitter.com/ChiefsAnalytics/status/1310758685325455360]
 ^[https://twitter.com/ChiefsAnalytics/status/1307839100896948230]
 ^[https://twitter.com/benbbaldwin/status/1311344809823657985]. 
@@ -273,7 +293,6 @@ p2<-cricjam_data_big %>%
 			 color = "")
 
 # plot_grid(p1,p2, labels=c("",""))
-p1
 p2
 
 	
@@ -286,7 +305,7 @@ p2
 
 We can also use waRne and other R packages as an easy way to engage students in learning statistical concepts.
 
-For example using the above we can not only look at the answers graphically, but we can run a statistical test. A common classroom example for learning the binomial distribution is to ask if a coin is based given a proportion of heads and tails given a sample size [@mcelreath2020statistical]. Instead of asking about coins, fans of sport and cricket might be interested to ask the question; after winning the coin toss, should a team decide to bat first or bat second [@kvam2004teaching].
+For example,a common classroom example for learning the binomial distribution is to ask if a coin is based given a proportion of heads and tails given a sample size [@mcelreath2020statistical]. Instead of asking about coins, fans of sport and cricket might be interested to ask the question; after winning the coin toss, should a team decide to bat first or bat second [@kvam2004teaching].
 
 While a coin toss is a seemingly trivial example, like in most professional sports the winner of the coin toss gets to decide what to do. In cricket, the winner of the coin toss gets to decide if they want to bat first and thus set the total that the opposition needs to pass by a single run to win, or if they want to bowl first and thus chase down the total set. Deciding what to do after winning a coin toss has proved to be a popular media piece in recent years
 ^[https://www.espncricinfo.com/story/_/id/21489056/stuart-wark-cricket-move-away-coin-toss]
@@ -307,7 +326,7 @@ Fans and analysts of the game might want to make this decision based on a simple
 
 
 
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE,out.width = "80%"}
 library(broom)
 cricjam_data_big %>% 
 	dplyr::filter(inning == 1, 
@@ -348,7 +367,7 @@ cricjam_data_big %>%
 
 The yorker is considered the most difficult delivery to hit for a number of reasons . By pulling the delivery type from the play description on espncricinfo, every time a yorker was bowled we have the players who bowled and batted. We can take a look at the ability to hit yorkers for the closers we compared Dhoni to, and see how they all fare against the most difficult delivery in the game. 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE,out.width = "80%"}
 middle_batsman_of_interest <- c(
   230559, #pollard
   32498, #yusef pathan
@@ -405,7 +424,7 @@ Cricket is an obvious sort of sport, to win in the end you have to get one run m
 
 Espncricinfo did article on teams that win games get a higher proportion of their runs in the powerplay and first 10 overs. But proportion of team runs in T20 games doesn't really make sense as a batting metric as we are not just concerned with how many runs they get, but how quickly they get them. So we measure our batsmen's performances by how well they perform when there is a known target, that is in second innings only, and how they affect their teams required run rate while at bat. 
 
-```{r,message=FALSE, echo=FALSE, warning=FALSE}
+```{r,message=FALSE, echo=FALSE, warning=FALSE,out.width = "80%"}
 # graph of powerplay
 
 opening_batsman_of_interest <- c(
@@ -482,7 +501,7 @@ This graph makes sense as we can see some of the best openers in the world lower
 
 Dhoni is considered the greatest closing batsman in the world. He has pulled of many spectacular saves, and has excellent T20 and T20I strike rates after 14 years in the game. But how does his required run rate compare to other middle order and closing batsman. We compare him to some well known middle and closing batsmen from across T20 below. Starting in the middle overs where he plays most often, we compare the required run rates
 
-```{r,message=FALSE, echo=FALSE, warning=FALSE}
+```{r,message=FALSE, echo=FALSE, warning=FALSE,out.width = "80%"}
 # middle overs (enter in the middle)
 
 middle_batsman_of_interest <- c(
@@ -556,7 +575,7 @@ It seems as though in the middle he is letting the game get out of hand. How can
 
 One possible explanation comes from looking at the acceleration of Dhoni compared to these other middle order batsmen. Dhoni comes in usually around overs 11/12, and from the plot below we can see that he is a slow starter, it takes several overs for him to get his strike rate up, which consistently stays high throughout the game even when other batsmen's begins to drop off. It seems he takes a while to warm up, which explains why he comes in early in the second half.
 
-```{r,message=FALSE, echo=FALSE, warning=FALSE}
+```{r,message=FALSE, echo=FALSE, warning=FALSE,out.width = "80%"}
 
 cricjam_data_big %>% 
     dplyr::filter(batsman_id %in% middle_batsman_of_interest, 
@@ -590,7 +609,7 @@ cricjam_data_big %>%
 
 Another we considered is the effort of Dhoni's partner to keep the required run rate down while he's at the crease, but those results couldn't show us that Dhoni is elite in these overs at all
 
-```{r, message=FALSE,echo=FALSE, warning=FALSE}
+```{r, message=FALSE,echo=FALSE, warning=FALSE,out.width = "80%"}
 
 middle_batsman_of_interest <- c(
   230559, #pollard
@@ -857,7 +876,7 @@ pollard %>%
 
 ```
 
-```{r,message=FALSE,echo=FALSE, warning=FALSE}
+```{r,message=FALSE,echo=FALSE, warning=FALSE,out.width = "80%"}
 
 middle_batsman_of_interest <- c(
   230559, #pollard
