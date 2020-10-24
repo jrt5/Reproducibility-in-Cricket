@@ -3,6 +3,7 @@
 
 extract_data_commentary_scorecards <- function(year_input, root_path){
 	
+	# define your file path
 	data_path <- paste(root_path, "/", "data", sep = "")
 	player_path <- paste(data_path, "_files/player_list.Rdata", sep = "")
 	
@@ -22,6 +23,7 @@ extract_data_commentary_scorecards <- function(year_input, root_path){
 	
 	out <- tibble()
 	
+	# Ok read through each row, but ignore ones you didn't scrape
 	for(i in 1:nrow(commentary)){
 		
 		scorecard_link_check <- 
@@ -78,6 +80,9 @@ extract_data_commentary_scorecards <- function(year_input, root_path){
 		}
 		
 		if(!is.na(inn1_commentary)){
+
+			# connecting the batsmen and bowlers by their id is tricky. The scorecard has hyperlinks to their 
+			# names, we take advantage of that to better connect players 
 			
 			batsmen_who_batted <- 
 				inning1_scorecard %>% 
@@ -135,6 +140,9 @@ extract_data_commentary_scorecards <- function(year_input, root_path){
 																					 1, 
 																					 sep = "\\.html")))
 			
+			# Sav this player link to another dataset to scrape their links, which you can reconnect 
+			# to the data later
+			
 			if(!file.exists(player_path)){
 				player_list <- 
 					tibble()
@@ -159,6 +167,8 @@ extract_data_commentary_scorecards <- function(year_input, root_path){
 				distinct(player_name, player_id, player_links)
 			
 			save(player_list, file = player_path)
+
+			# This is the inning summary
 			
 			inning_sum <-
 				inning1_scorecard %>% 
@@ -177,12 +187,14 @@ extract_data_commentary_scorecards <- function(year_input, root_path){
 				mutate(summary = paste(value, value1, sep = " ")) %>% 
 				pull(summary)
 			
+			# match summary
 			match_sum <- 
 				inning1_commentary %>% 
 				html_nodes(".match-header") %>% 
 				html_nodes(".summary") %>% 
 				html_text() 
 			
+			# First inning play by play data, each variable is self explanatory
 			out1 <- 
 				tibble(over = 
 							 	inning1_commentary %>% 
@@ -265,7 +277,8 @@ extract_data_commentary_scorecards <- function(year_input, root_path){
 							 required_run_rate = 0, 
 							 balls_remaining = if_else(tournament_type == "One-Day International", 300-(6*over_number-abs(7-ball_in_over)), 120-(6*over_number-abs(7-ball_in_over)))) 
 				
-			
+			# when you flip it to go from over 0.1 to the end, the wickets and extras are backwards, so this 
+			# flips them back into the right order
 			for(z in 1:(nrow(out1)-1)){
 				if(i != nrow(out1)){
 					if(out1$over[z]==out1$over[z+1]){
@@ -285,6 +298,7 @@ extract_data_commentary_scorecards <- function(year_input, root_path){
 				}
 			}
 			
+			# Let's add a few more variables like rpo, a running total of runs, etc
 			out1 <- 
 				out1 %>% 
 				mutate(inning_runs = 
@@ -311,6 +325,13 @@ extract_data_commentary_scorecards <- function(year_input, root_path){
 							 	as_tibble() %>% 
 							 	dplyr::filter(grepl("D/L method", value)) %>% 
 							 	nrow()>0)
+			
+			# Back to the most difficult aspect of this scraping project, connecting batsmen and bowler name
+			# to the dataset. They are typially addressed by last name, which makes it simple to identify
+			# from the list of batsmen and bowlers above. The difficulty comes from multiple players with the 
+			# same last name in a match, ? values instead of player names, misspelled names. And those are 
+			# just the problems I have found so far. This will be continuously updated over time as they
+			# are addressed. ? has not yet been fixed
 			
 			bowler_data_inning_1 <- 
 				out1 %>% 
@@ -374,6 +395,9 @@ extract_data_commentary_scorecards <- function(year_input, root_path){
 				left_join(batting_order, by = c("batsman_links" = "batsman_links")) %>% 
 				distinct()
 			
+			# Because of the scrolling required to access all the data in the html, sometimes the webite
+			# was not fully loaded while scraping. This is a check, if it needs rescraping it will not
+			# include over 0.1, which means variables like runs, rpo, wickets, etc. will be wrong
 			min_over <- 
 				min(out1$over)
 			
