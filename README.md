@@ -13,11 +13,7 @@ Included is a copy of the ODI ball-by-ball DLS table, found at http://icc-live.s
 library(devtools)
 install_github(jrt5/waRne)
 
-To install the 3 data sets, (better figure that out)
-
-## Adding New Data To The Existing Data Set
-
-It's simple, left join
+To install the 3 data sets, use the data() function
 
 ## Scraping New Data
 
